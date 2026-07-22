@@ -673,8 +673,7 @@ function renderWeather(S){
 
 /* ============ PÄIVÄN OHJELMA (Leirilukkari) ============ */
 // Upotettu yleisohjelma (koko leirin yhteiset tapahtumat) — varmuuskopio.
-const SCHED_SNAP = [{"a":"Saapuminen","s":"2026-07-10T06:00:00.000Z","e":"2026-07-10T09:00:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Majoittumista ja rakentamista","s":"2026-07-10T10:30:00.000Z","e":"2026-07-10T13:30:00.000Z","l":"Savuissa","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Avajaiset","s":"2026-07-10T15:00:00.000Z","e":"2026-07-10T17:30:00.000Z","l":"Päälava","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Iltapala","s":"2026-07-10T17:30:00.000Z","e":"2026-07-10T19:00:00.000Z","l":"Ruokala","g":[]},{"a":"Hiljaisuus","s":"2026-07-10T19:00:00.000Z","e":"2026-07-10T19:15:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Haastavan ryhmän kanssa toimiminen -koulutus ","s":"2026-07-11T06:30:00.000Z","e":"2026-07-11T09:30:00.000Z","l":"LPKP goes Kaiku (Leirisuora)","g":["vaeltajat","aikuiset"]},{"a":"Tervetuloa partioon –koulutus","s":"2026-07-11T10:30:00.000Z","e":"2026-07-11T13:30:00.000Z","l":"LPKP goes Kaiku (Leirisuora (lähtö teltalta))","g":["vaeltajat","aikuiset"]},{"a":"Ansiomerkkiehdotuksen ABC & ansiomerkkiraati ","s":"2026-07-11T11:30:00.000Z","e":"2026-07-11T13:30:00.000Z","l":"LPKP goes Kaiku (Leirisuora)","g":["vaeltajat","aikuiset"]},{"a":"Savuilta","s":"2026-07-11T15:00:00.000Z","e":"2026-07-11T16:00:00.000Z","l":"Savuissa","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Nuotioilta","s":"2026-07-11T16:30:00.000Z","e":"2026-07-11T17:30:00.000Z","l":"Monumentti","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Iltapala","s":"2026-07-11T17:30:00.000Z","e":"2026-07-11T19:00:00.000Z","l":"Ruokala","g":[]},{"a":"Hiljaisuus","s":"2026-07-11T19:00:00.000Z","e":"2026-07-11T19:15:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Tervetuloa partioon –koulutus ","s":"2026-07-12T06:30:00.000Z","e":"2026-07-12T09:30:00.000Z","l":"LPKP goes Kaiku (Leirisuora (lähtö teltalta))","g":["vaeltajat","aikuiset"]},{"a":"Lippukunta syyskuntoon ","s":"2026-07-12T10:30:00.000Z","e":"2026-07-12T13:30:00.000Z","l":"LPKP goes Kaiku (Leirisuora)","g":["vaeltajat","aikuiset"]},{"a":"Samoajailta","s":"2026-07-12T15:00:00.000Z","e":"2026-07-12T17:30:00.000Z","l":"ZillZone","g":["samoajat"]},{"a":"SuSe-bileet","s":"2026-07-12T16:00:00.000Z","e":"2026-07-12T17:00:00.000Z","l":"","g":["suset"]},{"a":"Iltapala","s":"2026-07-12T17:30:00.000Z","e":"2026-07-12T19:00:00.000Z","l":"Ruokala","g":[]},{"a":"Hiljaisuus","s":"2026-07-12T19:00:00.000Z","e":"2026-07-12T19:15:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Vierailupäivä","s":"2026-07-13T06:00:00.000Z","e":"2026-07-13T09:00:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Haastavan ryhmän kanssa toimiminen -koulutus","s":"2026-07-13T06:30:00.000Z","e":"2026-07-13T09:30:00.000Z","l":"LPKP goes Kaiku (Leirisuora)","g":["aikuiset","vaeltajat"]},{"a":"Laaksot avoinna vierailijoille","s":"2026-07-13T07:00:00.000Z","e":"2026-07-13T11:00:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Viestintä ja markkinointi osana elinvoimaista lippukuntaa","s":"2026-07-13T10:00:00.000Z","e":"2026-07-13T11:00:00.000Z","l":"LPKP goes Kaiku (Leirisuora)","g":["vaeltajat","aikuiset"]},{"a":"Vierailupäivä","s":"2026-07-13T10:30:00.000Z","e":"2026-07-13T13:30:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Poistuminen","s":"2026-07-13T10:30:00.000Z","e":"2026-07-13T13:30:00.000Z","l":"","g":["suset"]},{"a":"Haikin pakkaus","s":"2026-07-13T10:30:00.000Z","e":"2026-07-13T13:30:00.000Z","l":"","g":["samoajat","tarpojat"]},{"a":"Keskiäiset","s":"2026-07-13T15:00:00.000Z","e":"2026-07-13T17:00:00.000Z","l":"Päälava","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Iltapala","s":"2026-07-13T17:30:00.000Z","e":"2026-07-13T19:00:00.000Z","l":"Ruokala","g":[]},{"a":"Tarpojabileet","s":"2026-07-13T18:00:00.000Z","e":"2026-07-13T19:30:00.000Z","l":"Ohjelmalava","g":["tarpojat"]},{"a":"Hiljaisuus","s":"2026-07-13T20:30:00.000Z","e":"2026-07-13T20:45:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Haikki","s":"2026-07-14T06:00:00.000Z","e":"2026-07-14T21:00:00.000Z","l":"","g":["samoajat","tarpojat"]},{"a":"Vaeltajailta","s":"2026-07-14T15:00:00.000Z","e":"2026-07-14T17:30:00.000Z","l":"ZillZone","g":["vaeltajat"]},{"a":"Iltapala","s":"2026-07-14T17:30:00.000Z","e":"2026-07-14T19:00:00.000Z","l":"Ruokala","g":[]},{"a":"Aikuisten bileet","s":"2026-07-14T18:00:00.000Z","e":"2026-07-14T19:30:00.000Z","l":"Ohjelmalava","g":["aikuiset"]},{"a":"Hiljaisuus","s":"2026-07-14T20:30:00.000Z","e":"2026-07-14T20:45:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Haikki","s":"2026-07-15T04:00:00.000Z","e":"2026-07-15T09:00:00.000Z","l":"","g":["samoajat","tarpojat"]},{"a":"Huollot ja palautuminen","s":"2026-07-15T10:30:00.000Z","e":"2026-07-15T12:00:00.000Z","l":"","g":["samoajat","tarpojat"]},{"a":"Leirin jumalanpalvelus","s":"2026-07-15T12:00:00.000Z","e":"2026-07-15T13:30:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Haikin voittajan julistus","s":"2026-07-15T15:00:00.000Z","e":"2026-07-15T15:30:00.000Z","l":"ZillZone","g":[]},{"a":"Tarpojailta","s":"2026-07-15T15:00:00.000Z","e":"2026-07-15T17:30:00.000Z","l":"ZillZone","g":["tarpojat"]},{"a":"Iltapala","s":"2026-07-15T17:30:00.000Z","e":"2026-07-15T19:00:00.000Z","l":"Ruokala","g":[]},{"a":"Samoaja-Vaeltajabileet","s":"2026-07-15T18:00:00.000Z","e":"2026-07-15T19:30:00.000Z","l":"Ohjelmalava","g":["samoajat","vaeltajat"]},{"a":"Hiljaisuus","s":"2026-07-15T20:30:00.000Z","e":"2026-07-15T20:45:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Lippukunta syyskuntoon ","s":"2026-07-16T06:00:00.000Z","e":"2026-07-16T09:00:00.000Z","l":"LPKP goes Kaiku (Leirisuora)","g":["aikuiset","vaeltajat"]},{"a":"Iltapala","s":"2026-07-16T17:30:00.000Z","e":"2026-07-16T19:00:00.000Z","l":"Ruokala","g":[]},{"a":"Hiljaisuus","s":"2026-07-16T20:30:00.000Z","e":"2026-07-16T20:45:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Perinnelaakso avoinna kaikille","s":"2026-07-17T06:00:00.000Z","e":"2026-07-17T09:00:00.000Z","l":"Perinnelaakso","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Taitolaakso avoinna kaikille","s":"2026-07-17T10:30:00.000Z","e":"2026-07-17T13:30:00.000Z","l":"Taitolaakso","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Päättäjäiset","s":"2026-07-17T15:00:00.000Z","e":"2026-07-17T17:30:00.000Z","l":"Päälava","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Iltapala","s":"2026-07-17T17:30:00.000Z","e":"2026-07-17T19:00:00.000Z","l":"Ruokala","g":[]},{"a":"Lauluilta","s":"2026-07-17T19:00:00.000Z","e":"2026-07-17T20:00:00.000Z","l":"Raffun lava","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Hiljaisuus","s":"2026-07-17T20:30:00.000Z","e":"2026-07-17T20:45:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Purkaminen ja pakkaaminen","s":"2026-07-18T06:00:00.000Z","e":"2026-07-18T09:00:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]},{"a":"Poistuminen","s":"2026-07-18T10:30:00.000Z","e":"2026-07-18T13:30:00.000Z","l":"","g":["aikuiset","samoajat","suset","tarpojat","vaeltajat"]}];
-let SCHED = SCHED_SNAP;
+let SCHED = [];  // ilves26: aikataulu haetaan ICS-feedeistä (ks. loadScheduleLive)
 
 function categorize(act){
   const s = (act||'').toLowerCase(), has = w => s.includes(w);
@@ -733,30 +732,52 @@ function renderSchedule(){
     </div>`;
   }).join('');
 }
-// Yritä hakea täysi ohjelma Kaiku-rajapinnasta (jos saavutettavissa)
-async function loadScheduleLive(){
-  const bases = ['https://kaiku2026.fi/api/schedules?limit=1000&depth=0&sort=startTime'];
-  for (const url of bases){
-    try{
-      const r = await fetch(url, { headers:{ Accept:'application/json' }});
-      if (!r.ok) continue;
-      const j = await r.json();
-      const docs = j.docs || j;
-      if (Array.isArray(docs) && docs.length){
-        // vain koko leirin yhteiset (ei alaleiri-/sivukohtaisia)
-        SCHED = docs
-          .filter(it => (!it.subCamps || !it.subCamps.length) && (!it.pages || !it.pages.length))
-          .map(it => ({ a: it.activity, s: it.startTime, e: it.endTime, l: it.location||'' }));
-        renderSchedule();
-        return;
-      }
-    }catch(e){ /* CORS tms. → käytä upotettua */ }
+// Ohjelma haetaan ilves26-sovelluksen Aikataulu-liitännäisestä (ICS-feedit sisään
+// leivottuina). Näytetään valittu ikäkausi + alaleiri sekä yhteiset (yleiset.ics).
+const SCHED_AGE  = 'vaeltaja-aikuinen';   // ikäkausi (sudenpentu|seikkailija|tarpoja|samoaja|vaeltaja-aikuinen)
+const SCHED_CAMP = 'havus';               // alaleiri (havus|lehdes) – ei vaikuta jakamattomiin ikäkausiin
+const SCHED_BUNDLE_URL = 'https://ilves26.coregoapp.com/apiv3/release/iphone/11/section/78357980/index.html?define_function=1';
+// Pieni ICS-jäsennin (feedit ovat yksinkertaisia UTC-VEVENTtejä, ei toistoa/koko päivän tapahtumia)
+function parseIcsEvents(ics){
+  const out = [];
+  const text = String(ics).replace(/\r?\n[ \t]/g, ''); // pura rivitaitto
+  const isoOf = (v) => {
+    const m = (v||'').match(/(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})(Z)?)?/);
+    if (!m) return '';
+    const [, Y, Mo, D, h = '00', mi = '00', se = '00', z] = m;
+    return `${Y}-${Mo}-${D}T${h}:${mi}:${se}${z ? 'Z' : ''}`;
+  };
+  for (const block of text.split('BEGIN:VEVENT').slice(1)){
+    const body = block.split('END:VEVENT')[0];
+    const field = (re) => { const m = body.match(re); return m ? m[1].trim() : ''; };
+    const s = isoOf(field(/DTSTART[^:\n]*:([0-9TZ]+)/));
+    const e = isoOf(field(/DTEND[^:\n]*:([0-9TZ]+)/)) || s;
+    const a = field(/SUMMARY[^:\n]*:(.+)/);
+    if (!s || !a) continue;
+    out.push({ a, s, e, l: '', g: [] });
   }
+  return out;
+}
+async function loadScheduleLive(){
+  try{
+    const r = await fetch(SCHED_BUNDLE_URL, { cache:'no-store' });
+    if (!r.ok) return;
+    const t = await r.text();
+    const m = t.match(/ICS_BUNDLE\s*=\s*(\{[\s\S]*?\});/);
+    if (!m) return;
+    const bundle = JSON.parse(m[1]);
+    // Sama logiikka kuin liitännäisessä: ${ikäkausi}-${alaleiri}.ics jos on, muuten ${ikäkausi}.ics; + yleiset
+    const split = `${SCHED_AGE}-${SCHED_CAMP}.ics`;
+    const ageFeed = bundle[split] ? split : `${SCHED_AGE}.ics`;
+    let evs = [];
+    for (const f of [ageFeed, 'yleiset.ics']) if (bundle[f]) evs = evs.concat(parseIcsEvents(bundle[f]));
+    if (evs.length){ SCHED = evs; renderSchedule(); }
+  }catch(e){ /* CORS tms. → jää tyhjäksi */ }
 }
 
-/* ============ UUTISET (Kaiku 2026 -sovellus) ============ */
-const NEWS_SNAP = [{"title":"Päivän ruokalista, erityisruokavaliot & allergeenit","author":"Huugo Wahalahti","date":"2026-07-10T15:35:00+02:00","url":"https://kaiku2026.coregoapp.com/paauutiset/i/97300302/paivan-ruokalista-erityisruokavaliot-allergeenit","thumb":"https://cmsphoto.ww-cdn.com/resizeapi/eaa721ed2eaa02a218a8c9e13a543ba5e60bdfaa/314/196/","summary":"PÄIVÄLLINEN, PERJANTAI 10.7."},{"title":"Kaiku NYT -feed","author":"Sampo Syrjämäki","date":"2026-07-10T15:31:00+02:00","url":"https://kaiku2026.coregoapp.com/paauutiset/i/97300247/kaiku-nyt-feed","thumb":"https://cmsphoto.ww-cdn.com/resizeapi/89c1c1b1ac0de3f66a9cf9845f23d729b9c3e43d/314/196/","summary":"Oletko vielä tarkistanut Kaikun NYT-feediä? Kaiku NYT-feedistä löydät ajankohtaisia ja uusimpia uutisia leiriin liittyen! Kaiku NYT löytyy etusivun alareunasta ja sinne päivitetään keskeisiä uutisia esimerkiksi aukioloajoista ja leirivinkeistä!"},{"title":"Päivitäthän leirisovelluksen!","author":"Sampo Syrjämäki","date":"2026-07-10T10:43:00+02:00","url":"https://kaiku2026.coregoapp.com/paauutiset/i/97297417/article-90","thumb":"https://cmsphoto.ww-cdn.com/resizeapi/85178be731fb9683283e5261835ef6c9f176de91/314/196/","summary":"Jotta saat uusimmat leirin tiedot käyttöösi, päivitäthän sovelluksen sovelluskaupasta & varmistat, että sinulla on päällä automaattiset päivitykset Kaiku 2026 -sovellukselle. Tiedotteet ja Kaiku NYT -feed päivittyvät ilman sovelluksen päivitystä, mutta esimerkiksi etusivun rakenteeseen on tullut muutoksia."},{"title":"Muutoksia avajaisten aikataulussa","author":"Huugo Wahalahti","date":"2026-07-10T08:37:00+02:00","url":"https://kaiku2026.coregoapp.com/paauutiset/i/97296447/poikkeava-aikataulu-avajaisten-suhteen","thumb":"https://cmsphoto.ww-cdn.com/resizeapi/142b3b41fbb2c5e000cbb5c04a04a8be94cf326c/314/196/","summary":"Kuva: Taneli Kotro / Pääkaupunkiseudun Partiolaiset Avajaisten aikatauluun on tullut muutoksia. Uusi alkamisaika on klo 19.00"},{"title":"Tervetuloa Kaiku-sovellukseen!","author":"Sampo Syrjämäki","date":"2026-06-02T17:28:00+02:00","url":"https://kaiku2026.coregoapp.com/paauutiset/i/96819317/tervetuloa-kaiku-sovellukseen","thumb":"https://cmsphoto.ww-cdn.com/resizeapi/25e47db32f0ccf20e22ffac88bc3b51c2193a57b/314/196/","summary":"Kaiku-sovellus on julkaistu ja tällä hetkellä kehitysvaiheessa!"}];
-const NEWS_APP = '4554399', NEWS_SECTION = '78074354'; // Pääuutiset-osio
+/* ============ UUTISET (ilves26-sovellus) ============ */
+const NEWS_APP = '4406427';                       // ilves26 GoodBarber-sovellus
+const NEWS_SECTIONS = ['75180339', '77682659'];   // Tiedotteet + Ilves NYT
 
 function relTime(iso){
   const p = helParts(iso), pn = helParts(Date.now());
@@ -773,7 +794,7 @@ function renderNews(list, live){
     <a class="art" href="${a.url}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">
       ${a.thumb ? `<div class="thumb"><img src="${a.thumb}" alt="" loading="lazy"></div>` : ''}
       <div class="meta">
-        <div class="kick">${a.author||'Kaiku 2026'} · ${relTime(a.date)}</div>
+        <div class="kick">${a.author||'ilves26'} · ${relTime(a.date)}</div>
         <div class="at">${a.title||''}</div>
         <div class="ax">${(a.summary||a.excerpt||'').trim()}</div>
       </div>
@@ -781,27 +802,29 @@ function renderNews(list, live){
   setupAutoScroll();
 }
 async function loadNews(){
-  // Pääuutiset-osion sisältö suoraan Kaiku-sovelluksen (GoodBarber) rajapinnasta.
+  // Tiedotteet + Ilves NYT suoraan ilves26-sovelluksen (GoodBarber) rajapinnasta, yhdistettynä.
+  const strip = h => (h||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
   try{
-    const r = await fetch(`https://api.ww-api.com/front/get_items/${NEWS_APP}/${NEWS_SECTION}/`, {
-      headers:{ Accept:'application/json' }
-    });
-    if (r.ok){
-      const j = await r.json();
-      const arr = j.items || j[NEWS_SECTION] || [];
-      if (Array.isArray(arr) && arr.length){
-        const strip = h => (h||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
-        const list = arr.map(a => ({
-          title:a.title, author:a.author, date:a.date, url:a.url,
-          thumb:a.thumbnail || a.smallThumbnail || a.largeThumbnail || '',
-          summary: a.summary || strip(a.content).slice(0,180)
-        }));
-        renderNews(list, true);
-        return;
-      }
+    const results = await Promise.all(NEWS_SECTIONS.map(sec =>
+      fetch(`https://api.ww-api.com/front/get_items/${NEWS_APP}/${sec}/`, { headers:{ Accept:'application/json' }})
+        .then(r => r.ok ? r.json() : null)
+        .then(j => (j && (j.items || j[sec])) || [])
+        .catch(() => [])
+    ));
+    const arr = results.flat();
+    if (arr.length){
+      const list = arr.map(a => ({
+        title:a.title, author:a.author, date:a.date, url:a.url,
+        thumb:a.thumbnail || a.smallThumbnail || a.largeThumbnail || '',
+        summary: a.summary || a.leadin || strip(a.content).slice(0,180)
+      })).sort((x,y) => String(y.date).localeCompare(String(x.date)));
+      renderNews(list, true);
+      return;
     }
-  }catch(e){ /* CORS/tyhjä → varmuuskopio */ }
-  renderNews(NEWS_SNAP, false);
+  }catch(e){ /* CORS/tyhjä */ }
+  const st = document.getElementById('newsStatus');
+  st.className = 'sub'; st.textContent = 'Ei yhteyttä';
+  document.getElementById('newsTrack').innerHTML = '<div class="muted">Uutisia ei juuri nyt saatavilla.</div>';
 }
 
 /* ---- pystysuora auto-scroll vain jos sisältö ei mahdu ---- */

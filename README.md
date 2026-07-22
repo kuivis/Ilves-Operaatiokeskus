@@ -12,11 +12,11 @@ A single-page TV dashboard for the **ilves26** scout camp operations centre
 > **Brand:** red `#CE5738`, green `#80884f`, gold `#D39C2F`, black `#101010`, cream
 > `#F5F1E8`; type **Nunito** (headings) + **Jost** (body); logos in [`assets/`](assets/).
 >
-> **Data-source caveat:** the live data endpoints are inherited from the Kaiku deployment —
-> weather/radar are Evo (correct for ilves26), but **news** still reads the Kaiku app API and
-> **tickets/Osallistujaviestintä** still point at Kaiku's SharePoint. Repoint these for the
-> real ilves26 deployment (see `CLAUDE.md`). A Microsoft Planner/Teams board is a candidate
-> future source for tasks.
+> **Data sources:** weather/radar (Evo), **news** (ilves26 app — Tiedotteet + Ilves NYT) and
+> the **schedule** (ilves26 app *Aikataulu*, showing **Havus → Vaeltaja/Aikuinen**) are all
+> live from ilves26. Only **tickets/Osallistujaviestintä** still point at Kaiku's SharePoint via
+> the `ticket-server` — repoint those for the real ilves26 deployment (see `CLAUDE.md`). A
+> Microsoft Planner/Teams board is a candidate future source for tasks.
 
 ## Panels
 

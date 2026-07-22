@@ -22,9 +22,18 @@ SharePoint tickets. Everything is Finnish-first and uses the **ilves26** visual 
   a cream **scalloped wave** bottom edge (the brand aaltoviiva) — this is wanted here (unlike
   upstream, where the header wave was removed).
 - **Camp dates:** `CAMP_START`/`CAMP_END` = 23.–31.7.2026 (Evo).
-- **Data caveat:** news still hits the Kaiku app API and tickets/form still point at Kaiku's
-  SharePoint — repoint for the real ilves26 deployment. Microsoft Planner/Teams is a candidate
-  future task source.
+- **Data sources (ilves26):**
+  - **News** = ilves26 GoodBarber app (`api.ww-api.com/front/get_items/4406427/<section>/`),
+    merging **Tiedotteet** `75180339` + **Ilves NYT** `77682659` (sorted newest-first).
+  - **Schedule** = the app's **Aikataulu** plugin (section `78357980`), whose `index.html`
+    embeds an `ICS_BUNDLE` object of per-feed `.ics` strings (Google Calendar exports). We fetch
+    that bundle, pick `${SCHED_AGE}-${SCHED_CAMP}.ics` (or `${SCHED_AGE}.ics` when the age isn't
+    split by subcamp) **+ `yleiset.ics`**, and parse the simple UTC VEVENTs. Config near the top
+    of the schedule code: `SCHED_AGE='vaeltaja-aikuinen'`, `SCHED_CAMP='havus'` — change these to
+    show a different ikäkausi/alaleiri. Feeds have no RRULE/all-day/TZID, so the parser is tiny.
+  - **Still Kaiku (repoint for ilves26):** tickets + Osallistujaviestintä come from the
+    `ticket-server` pointed at Kaiku's SharePoint. Microsoft Planner/Teams is a candidate future
+    task source.
 
 ## ⚠️ Read first
 - The dashboard is **one self-contained `index.html`** — HTML + CSS + vanilla JS, **no

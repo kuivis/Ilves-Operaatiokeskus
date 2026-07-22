@@ -15,8 +15,14 @@ Operaatiokeskus base; the ilves26 changes are visual only:
   and a cream **scalloped wave** bottom edge (the brand aaltoviiva — re-added on purpose here).
 - **Camp dates** → 23.–31.7.2026 (`CAMP_START`/`CAMP_END`).
 - **Board page** (`ticket-server/public`) recoloured to match; bucket colours remapped.
-- **Data endpoints unchanged** (still Kaiku news API + Kaiku SharePoint) — repoint for the real
-  ilves26 deployment. Planner/Teams is a candidate future source.
+- **News + schedule repointed to ilves26** (reverse-engineered the ilves26 GoodBarber/Corego app):
+  - News merges **Tiedotteet** (`75180339`) + **Ilves NYT** (`77682659`) from
+    `api.ww-api.com/front/get_items/4406427/…`, newest-first.
+  - Schedule reads the **Aikataulu** plugin's embedded `ICS_BUNDLE` (section `78357980`) and shows
+    **Havus → Vaeltaja/Aikuinen** = `vaeltaja-aikuinen.ics` + `yleiset.ics` (69 events; tiny UTC-ICS
+    parser, no RRULE). Configurable via `SCHED_AGE`/`SCHED_CAMP`.
+- **Still Kaiku:** tickets + Osallistujaviestintä (ticket-server → SharePoint) — repoint for the
+  real ilves26 deployment. Planner/Teams is a candidate future task source.
 
 ## Status: working
 
