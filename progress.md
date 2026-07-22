@@ -1,6 +1,22 @@
-# Progress — Kaiku 2026 Operaatiokeskus
+# Progress — ilves26 Operaatiokeskus
 
 A running log of what's built, the key decisions, and what's left.
+
+## Fork note
+
+This repo is a **fork of `samvaol/operaatiokeskus`** re-skinned to the **ilves26** brand
+(Hämeen Partiopiirin leiri, Evo 23.–31.7.2026). Everything below describes the shared
+Operaatiokeskus base; the ilves26 changes are visual only:
+
+- **Palette** → ilves26 red `#CE5738` / green `#80884f` (+ deep `#414a2c`) / gold `#D39C2F` /
+  cream `#F5F1E8` / black (no blue; environment folds into green).
+- **Type** → Nunito (headings, 900 italic greeting) + Jost (body); replaced Bricolage Grotesque.
+- **Header** → solid red with the `assets/ilves26-logo-valk.svg` logo, faint tree silhouettes,
+  and a cream **scalloped wave** bottom edge (the brand aaltoviiva — re-added on purpose here).
+- **Camp dates** → 23.–31.7.2026 (`CAMP_START`/`CAMP_END`).
+- **Board page** (`ticket-server/public`) recoloured to match; bucket colours remapped.
+- **Data endpoints unchanged** (still Kaiku news API + Kaiku SharePoint) — repoint for the real
+  ilves26 deployment. Planner/Teams is a candidate future source.
 
 ## Status: working
 

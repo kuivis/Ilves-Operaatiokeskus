@@ -3,28 +3,31 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="theme-color" content="#005448" />
-<title>Kaiku 2026 · Operaatiokeskus</title>
+<meta name="theme-color" content="#CE5738" />
+<title>ilves26 · Operaatiokeskus</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 <style>
-/* ===== Kaiku 2026 -brändi (Visuaalinen ilme V1) ===== */
+/* ===== ilves26 -brändi (Brändiopas v0.2) ===== */
 :root{
-  --metsa:#005448; --meri:#00445E; --rusko:#542337; --savu:#F9F3E6;
-  --punainen:#FF633A; --oranssi:#FF8940; --kulta:#FFAE40;
-  --magenta:#FF546E; --laventeli:#F0A6CF; --sininen:#6CB7E5;
-  --ink:#243029;          /* päävärimusta, hieman metsä-vivahteinen */
-  --ink-2:#5f6b60;        /* toissijainen teksti */
-  --ink-3:#9aa39a;        /* vaimennettu / metatieto */
+  /* Ilves26 päävärit: metsä/vihreä, punainen, kulta, valkoinen, musta (ei sinistä) */
+  --metsa:#80884f; --forest:#414a2c; --meri:#6c7a3f; --rusko:#6b4a34; --savu:#F5F1E8;
+  --punainen:#CE5738; --oranssi:#D9744A; --kulta:#D39C2F;
+  --magenta:#b5654a; --laventeli:#c9c6a8; --sininen:#80884f; /* ei-brändivärit ohjattu vihreään/ruskoon */
+  --ink:#201f1a;          /* päävärimusta (lämmin) */
+  --ink-2:#5c5a4e;        /* toissijainen teksti */
+  --ink-3:#9a978a;        /* vaimennettu / metatieto */
   --card:#fff;
-  --line:#e8e0cf;         /* yhtenäinen hiusviiva (lämmin) */
-  /* Väriroolit: kulta=leirin sydän, meri=ympäristö, punainen=huomio, metsä=rakenne */
-  --shadow:0 1px 2px rgba(20,40,32,.05), 0 6px 18px rgba(20,40,32,.06);
+  --line:#e6decb;         /* yhtenäinen hiusviiva (lämmin) */
+  /* Väriroolit: kulta=leirin sydän, punainen=huomio + brändipääväri, metsä=rakenne/ympäristö */
+  --shadow:0 1px 2px rgba(30,26,18,.05), 0 6px 18px rgba(30,26,18,.07);
   --radius:1rem;
-  --head:"Bricolage Grotesque",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  /* Ilves26 typografia: Nunito (otsikot) + Jost (leipäteksti) */
+  --head:"Nunito",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --body:"Jost","Nunito",-apple-system,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 /* skaalaus TV:lle: perusyksikkö seuraa 16:9 -näkymää */
@@ -35,25 +38,26 @@ body{
   line-height:1.25;
 }
 .app{display:grid; grid-template-rows:auto 1fr; height:100vh; width:100vw;}
+/* Leipäteksti (pidemmät lukutekstit) Jostilla; otsikot & data Nunitolla */
+.art .ax,.tk-desc,.fmsg .f-text,.ev .d,.modal-note .d,.muted{font-family:var(--body)}
 
 /* ===== Ylätunniste ===== */
 header{
-  position:relative; background:var(--metsa); color:var(--savu);
-  padding:1.25rem 2rem 1.35rem; overflow:hidden;
+  position:relative; background:var(--punainen); color:#fff;
+  padding:1.1rem 2rem 1.75rem; overflow:hidden;
 }
-header .kuosi{position:absolute; inset:0; opacity:.13; pointer-events:none}
-/* Kaiku 1 -väriraita alareunassa – terävä brändireuna aaltoviivan tilalle */
-header::after{content:""; position:absolute; left:0; right:0; bottom:0; height:.3rem; z-index:3;
-  background:linear-gradient(90deg,var(--punainen) 0%,var(--oranssi) 42%,var(--kulta) 100%)}
-.hrow{position:relative; z-index:1; display:flex; align-items:center; gap:1.6rem}
-.logo{width:8.2rem; height:auto; flex:0 0 auto}
+header .trees{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0}
+/* Ilves-aaltoreuna: savunvärinen aalto puskee otsikon alareunaan (brändin aaltoviiva) */
+header .wave{position:absolute; left:0; right:0; bottom:-1px; width:100%; height:1.4rem; z-index:4; display:block}
+.hrow{position:relative; z-index:2; display:flex; align-items:center; gap:1.6rem}
+.logo{height:3.7rem; width:auto; flex:0 0 auto}
 .greet{flex:1 1 auto; min-width:0}
-.greet .brandtag{font-size:.86rem; letter-spacing:.3em; text-transform:uppercase; color:var(--kulta); font-weight:700}
-.greet h1{font-size:2.75rem; font-weight:800; line-height:.98; letter-spacing:-.015em; margin-top:.28rem}
+.greet .brandtag{font-family:var(--body); font-size:.82rem; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.82); font-weight:500}
+.greet h1{font-size:2.7rem; font-weight:900; font-style:italic; line-height:.98; letter-spacing:-.01em; margin-top:.32rem; color:#fff}
 .greet h1 .who{color:var(--kulta)}
 .clockbox{flex:0 0 auto; text-align:right; display:flex; flex-direction:column; align-items:flex-end}
 .clockbox .time{font-size:3.2rem; font-weight:800; line-height:.92; font-variant-numeric:tabular-nums; letter-spacing:-.01em}
-.clockbox .date{font-size:1rem; color:rgba(249,243,230,.82); font-weight:500; text-transform:capitalize; margin-top:.15rem}
+.clockbox .date{font-family:var(--body); font-size:1rem; color:rgba(255,255,255,.85); font-weight:400; text-transform:capitalize; margin-top:.15rem}
 
 /* ===== Runko: 3 saraketta ===== */
 main{
@@ -67,8 +71,8 @@ main{
   border:1px solid var(--line);
   padding:1.1rem 1.2rem 1.15rem; display:flex; flex-direction:column; min-height:0;
 }
-.card.dark{background:var(--meri); color:var(--savu); border-color:transparent}
-.card.forest{background:var(--metsa); color:var(--savu); border-color:transparent}
+.card.dark{background:var(--forest); color:var(--savu); border-color:transparent}
+.card.forest{background:var(--forest); color:var(--savu); border-color:transparent}
 /* Väri kantaa merkitystä, ei koristele: kulta=leirin sydän, meri=ympäristö,
    punainen=vaatii huomiota, metsä=rakenteellinen/informatiivinen. */
 .card.timer{--accent:var(--kulta)}
@@ -356,41 +360,13 @@ main{
 
   <!-- ===================== YLÄTUNNISTE ===================== -->
   <header>
-    <svg class="kuosi" viewBox="0 0 1920 220" preserveAspectRatio="xMinYMin slice" aria-hidden="true">
-      <defs>
-        <pattern id="kp" width="46" height="64" patternUnits="userSpaceOnUse">
-          <path d="M11 -4 V30 a11 11 0 0 1 -22 0 M11 30 V64 M34 0 V34 a11 11 0 0 0 22 0 M34 34 V68"
-                fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
-        </pattern>
-      </defs>
-      <rect width="1920" height="220" fill="url(#kp)"/>
-    </svg>
+    <svg class="trees" viewBox="0 0 1920 170" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><defs><g id="spr"><path d="M0 -78 L20 -18 L-20 -18 Z"/><path d="M0 -44 L28 26 L-28 26 Z"/><path d="M0 -10 L36 78 L-36 78 Z"/><rect x="-5" y="66" width="10" height="34"/></g></defs><g fill="#fff" opacity="0.085"><use href="#spr" transform="translate(90 170) scale(1.15)"/><use href="#spr" transform="translate(250 170) scale(0.8)"/><use href="#spr" transform="translate(1690 170) scale(1.2)"/><use href="#spr" transform="translate(1850 170) scale(0.85)"/></g></svg>
 
     <div class="hrow">
-      <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1000" role="img" aria-label="Kaiku 2026">
-        <defs><style>.lo1{fill:#ffae40}.lo3{fill:#ff633a}.lo4{fill:#f9f3e6}</style></defs>
-        <path class="lo3" d="M544,373.1c-5.8-5.17-14.64-7.76-26.54-7.76s-20.75,2.5-26.54,7.51c-5.8,5.01-8.69,12.51-8.69,22.53s2.89,17.44,8.69,22.28c5.79,4.84,14.64,7.26,26.54,7.26s20.74-2.5,26.54-7.51c5.79-5.01,8.69-12.51,8.69-22.52,0-9.34-2.9-16.6-8.69-21.77Z"/>
-        <rect class="lo1" x="489.02" y="444.91" width="57.02" height="201.7"/>
-        <path class="lo1" d="M575.35,456.92c0,31.49,25.53,57.02,57.02,57.02v-148.6h-57.02v91.58Z"/>
-        <path class="lo1" d="M684.69,417.68c0,53.36-5.1,78.89-39.18,96.26,63.38,0,96.2-34.47,96.2-96.26v-17.84h-57.02v17.84Z"/>
-        <path class="lo1" d="M828.11,379.84v-42.65c0-39.54-32.17-71.71-71.71-71.71s-71.71,32.17-71.71,71.71h0v42.65h57.02v-42.65h0c0-8.1,6.59-14.69,14.69-14.69s14.69,6.59,14.69,14.69v42.65h57.02Z"/>
-        <path class="lo1" d="M489.02,829.56h0c0,8.1-6.59,14.69-14.69,14.69s-14.69-6.59-14.69-14.69h0v-162.95h-57.02v162.95h0c0,39.54,32.17,71.71,71.71,71.71s71.71-32.17,71.71-71.71h0v-162.95h-57.02v162.95Z"/>
-        <path class="lo1" d="M575.35,182.39v162.95h57.02v-162.95h0c0-39.54-32.17-71.71-71.71-71.71s-71.71,32.17-71.71,71.71h0v162.95h57.02v-162.95h0c0-8.1,6.59-14.69,14.69-14.69s14.69,6.59,14.69,14.69h0Z"/>
-        <path class="lo1" d="M846.18,592.63c-14.47-2.64-18.07-14.36-18.07-29.68v-163.11h-57.02v171.8c0,50.54,21.1,74.96,57.02,74.96,17.32,0,31.87-10.12,40.94-28.51,8.89-18.02,10.98-35.36,10.98-55.91-6.89,20.42-21.19,32.74-33.84,30.44Z"/>
-        <path class="lo1" d="M402.63,595.27v51.34h57.02v-203.53c0-45.57-32.97-77.74-73.63-77.74s-73.63,25.78-73.63,66.45c0,6.18.67,13.72,3.19,20.63,2.31-24.84,19.49-43.53,43.53-43.53s43.53,16.02,43.53,47.03v138.13s0,.09,0,.13c0,.08,0,.15,0,.23,0,.29,0,.58,0,.87Z"/>
-        <rect class="lo4" x="890.02" y="399.84" width="57.02" height="246.77"/>
-        <path class="lo4" d="M645.51,523.94h-13.14c-24.09,0-45.21-12.72-57.02-31.8v154.48h57.02v-112.68c40.84,0,52.32,32.89,52.32,86.26v26.42h57.02v-26.42c0-61.79-32.82-96.26-96.2-96.26Z"/>
-        <path class="lo4" d="M287.07,593.87c-3.67-34.95,9.14-58.34,22.1-72.66-10.37-40.64-41.51-62.89-92.32-62.89h-13.14v-135.8h-57.02v324.09h57.02v-168.4c34.31,0,52.32,9.06,52.32,76.49v91.9h54.44c-12.87-11.23-20.92-29.04-23.4-52.74Z"/>
-        <path class="lo4" d="M256.03,322.52v29.68c0,53.36-5.1,78.89-39.18,96.26,63.38,0,96.2-34.47,96.2-96.26v-29.68h-57.02Z"/>
-        <path class="lo4" d="M371.04,516.87c12.09-13.96,19.6-21.89,21.59-38.55-21.72,20.49-43.28,22.98-64.98,39.45-18.23,13.84-34.54,37.86-30.64,75.06,3.83,36.51,21.45,57.7,54.13,57.7,15.94,0,27.85-5.39,34.4-18.45,6.31-12.57,7.09-24.27,7.09-37.91-5.06,6.51-17.7,11.93-29.37,8.62-16.85-4.79-23.09-27.35-14.74-50.36,5.55-15.32,13.07-24.63,22.53-35.55Z"/>
-        <path class="lo4" d="M596.3,727.28l14.96-9.11c5.14-3.14,9.65-6.77,13.17-11.58,3.75-5.1,6.07-11.13,6.07-19.21,0-4.87-1.12-9-3.37-12.37-2.25-3.37-5.44-5.94-9.56-7.7-4.12-1.76-9.04-2.64-14.73-2.64-6.45,0-11.92,1.11-16.42,3.32-4.5,2.21-7.84,5.38-10.01,9.5-2.18,4.12-3.04,9.07-2.59,14.85l17.21,2.25c-.3-3.44.22-6.86,2.11-9.72,1.62-2.45,4.35-4.03,7.99-4.03,2.1,0,3.9.34,5.4,1.01,3.75,1.68,4.83,4.86,4.83,7.53,0,3.19-1.06,5.86-2.93,8.43-1.87,2.56-4.29,4.79-7.2,6.63l-28.12,18.78v18.45h57.13v-15.07l-36.1.45v-.67Z"/>
-        <path class="lo4" d="M725.52,671.27c-4.57-3-10.12-4.5-16.65-4.5s-12.13,1.52-16.81,4.55c-4.69,3.04-8.29,7.46-10.8,13.27-2.51,5.81-3.77,12.95-3.77,21.43,0,8.82,1.49,16.5,5.98,22.99,4.66,6.72,12.06,10.66,22.72,10.66,6.55,0,12.06-1.31,16.53-3.94,9.03-5.32,13.51-16.5,13.51-30.98,0-8.25-1.2-15.28-3.6-21.09-2.4-5.81-5.89-10.22-10.46-13.21ZM711.94,730.71c-1.5.9-3.22,1.35-5.17,1.35-2.63,0-4.9-.98-6.81-2.95-3.62-3.75-4.94-11.13-4.94-19.9,0-8.25,1.32-14.75,3.79-18.87,1.84-3.07,4.35-4.6,7.79-4.6,2.85,0,5.19.94,7.03,2.81,3.69,3.75,5.46,11.13,5.46,22.28,0,10.86-2.36,17.87-7.14,19.9Z"/>
-        <path class="lo4" d="M806.32,727.28l14.96-9.11c5.14-3.14,9.65-6.77,13.17-11.58,3.75-5.1,6.07-11.13,6.07-19.21,0-4.87-1.12-9-3.37-12.37-2.25-3.37-5.44-5.94-9.56-7.7-4.12-1.76-9.04-2.64-14.73-2.64-6.45,0-11.92,1.11-16.42,3.32-4.5,2.21-7.84,5.38-10.01,9.5-2.18,4.12-3.04,9.07-2.59,14.85l17.21,2.25c-.3-3.44.22-6.86,2.11-9.72,1.62-2.45,4.35-4.03,7.99-4.03,2.1,0,3.9.34,5.4,1.01,3.75,1.68,4.83,4.86,4.83,7.53,0,3.19-1.06,5.86-2.93,8.43-1.87,2.56-4.29,4.79-7.2,6.63l-28.12,18.78v18.45h57.13v-15.07l-36.1.45v-.67Z"/>
-        <path class="lo4" d="M937.84,698.77c-3.41-1.69-7.18-2.53-11.3-2.53-1.53,0-2.99.14-4.34.4-9.91,1.94-13.28,10.54-11.17,17.48,1.92-3.27,5.24-5.29,9.68-5.29,4.36,0,7.56,1.72,9.12,4.89.9,1.54,1.35,3.39,1.35,5.57,0,3.14-1.05,5.61-3.1,7.59-2.29,2.2-5.2,2.87-7.82,2.87-4.11,0-7.16-1.31-9.95-3.01-3.11-2.09-5.36-6.44-6.51-10.6-.75-3.44-1.2-6.55-1.2-11.36,0-6.44,1.12-11.65,3.43-16.31,2.29-4.62,5.73-6.63,9.29-6.63,3.71,0,6.6,1.35,8.43,4.05,1.12,1.5,1.76,3.67,1.91,6.52l16.98-2.59c-.16-8.1-3.44-13.98-9.87-17.71-4.79-2.66-10.7-3.6-16.42-3.6-9.03,0-16.9,3.14-23.09,9.4-6.19,6.26-9.29,15.66-9.29,28.23,0,12.22,2.83,21.63,8.49,28.23,5.66,6.6,13.93,9.9,24.8,9.9,7.29,0,13.06-1.67,17.31-5,4.35-3.41,6.85-8.34,8.03-14.55.97-3,1.46-5.96,1.46-8.89,0-9.9-4.28-16.55-10.53-20.07Z"/>
-      </svg>
+      <img class="logo" src="assets/ilves26-logo-valk.svg" alt="ilves26 — Hämeen Partiopiirin leiri, Evo 23.–31.7.2026" />
 
       <div class="greet">
-        <div class="brandtag">Kaiku 2026 · Operaatiokeskus</div>
+        <div class="brandtag">Hämeen Partiopiirin leiri · Evo 23.–31.7.2026</div>
         <h1 id="greeting">Hyvää päivää, <span class="who">Operaatiokeskus</span></h1>
       </div>
 
@@ -401,6 +377,7 @@ main{
         <div class="date" id="date">–</div>
       </div>
     </div>
+    <svg class="wave" viewBox="0 0 1440 24" preserveAspectRatio="none" aria-hidden="true"><path d="M0,13 C60,3 120,3 180,13 C240,23 300,23 360,13 C420,3 480,3 540,13 C600,23 660,23 720,13 C780,3 840,3 900,13 C960,23 1020,23 1080,13 C1140,3 1200,3 1260,13 C1320,23 1380,23 1440,13 L1440,24 L0,24 Z" fill="var(--savu)"/></svg>
   </header>
 
   <!-- ===================== RUNKO ===================== -->
@@ -408,7 +385,6 @@ main{
     <!-- SARAKE 1: leirikello + työvuoro + uudet tiketit -->
     <div class="col">
       <div class="card forest timer" style="flex:0 0 auto">
-        <svg class="kuosi" viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="400" height="220" fill="url(#kp)"/></svg>
         <div class="inner">
           <div class="card-h"><span class="ic"><svg aria-hidden="true"><use href="#i-clock"/></svg></span><h2>Leirikello</h2></div>
           <div class="phase" id="timerPhase">Leiri käynnissä</div>
@@ -420,7 +396,7 @@ main{
           </div>
           <div class="tbar">
             <div class="track"><div class="fill" id="tFill" style="width:0%"></div></div>
-            <div class="meta"><span>Pe 10.7. klo 9</span><span id="tPct">0 %</span><span>La 18.7.</span></div>
+            <div class="meta"><span>To 23.7. klo 10</span><span id="tPct">0 %</span><span>Pe 31.7.</span></div>
           </div>
         </div>
       </div>
@@ -468,7 +444,7 @@ main{
     <!-- SARAKE 4: uutiset + osallistujaviestintä -->
     <div class="col">
       <div class="card news" style="flex:1 1 auto">
-        <div class="card-h"><span class="ic"><svg aria-hidden="true"><use href="#i-megaphone"/></svg></span><h2>Pääuutiset · Kaiku-sovellus</h2><span class="sub" id="newsStatus">–</span></div>
+        <div class="card-h"><span class="ic"><svg aria-hidden="true"><use href="#i-megaphone"/></svg></span><h2>Uutiset · ilves26</h2><span class="sub" id="newsStatus">–</span></div>
         <div class="scroller"><div class="track" id="newsTrack"><div class="muted">Ladataan uutisia…</div></div></div>
       </div>
       <div class="card msgform" style="flex:0 0 auto">
@@ -509,8 +485,8 @@ main{
      • Ohjelma: Leirilukkari (Kaiku 2026 -rajapinta)  + upotettu varmuuskopio
    ============================================================ */
 const TZ = 'Europe/Helsinki';
-const CAMP_START = new Date('2026-07-10T09:00:00+03:00'); // Saapuminen / leiri alkaa
-const CAMP_END   = new Date('2026-07-18T16:30:00+03:00'); // Poistuminen
+const CAMP_START = new Date('2026-07-23T10:00:00+03:00'); // Saapuminen / leiri alkaa
+const CAMP_END   = new Date('2026-07-31T14:00:00+03:00'); // Poistuminen
 const EVO = { lat: 61.208, lon: 25.128, name: 'Evo' };
 
 /* ---- Helsingin ajan apurit ---- */

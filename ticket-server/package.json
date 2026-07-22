@@ -1,5 +1,5 @@
 {
-  "name": "operaatiokeskus-ticket-server",
+  "name": "ilves-operaatiokeskus-ticket-server",
   "version": "1.0.0",
   "private": true,
   "description": "Reads the 'Uusi' tickets from the SharePoint Opke/Ospa status view and serves them as Kaiku-styled JSON for the operaatiokeskus dashboard.",

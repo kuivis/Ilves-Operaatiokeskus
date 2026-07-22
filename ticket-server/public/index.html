@@ -3,18 +3,19 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="theme-color" content="#005448" />
-<title>Tiketit · Opke/Ospa</title>
+<meta name="theme-color" content="#CE5738" />
+<title>Tiketit · ilves26</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,900&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --metsa:#005448; --meri:#00445E; --rusko:#542337; --savu:#F9F3E6;
-  --punainen:#FF633A; --oranssi:#FF8940; --kulta:#FFAE40;
-  --ink:#2a2a26;
-  --shadow:0 1px 2px rgba(0,40,55,.05), 0 .7rem 1.8rem rgba(0,40,55,.09);
-  --head:"Bricolage Grotesque",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --metsa:#80884f; --forest:#414a2c; --meri:#6c7a3f; --rusko:#6b4a34; --savu:#F5F1E8;
+  --punainen:#CE5738; --oranssi:#D9744A; --kulta:#D39C2F;
+  --ink:#201f1a;
+  --shadow:0 1px 2px rgba(30,26,18,.05), 0 .7rem 1.8rem rgba(30,26,18,.09);
+  --head:"Nunito",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --body:"Jost","Nunito",sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:clamp(12px, calc(.35vw + .55vh), 20px)}
@@ -22,7 +23,7 @@ body{font-family:var(--head); background:var(--savu); color:var(--ink); height:1
 .app{height:100vh; display:flex; flex-direction:column; padding:1.1rem 1.3rem 1.1rem}
 
 /* header */
-header{position:relative; flex:0 0 auto; background:var(--metsa); color:var(--savu); border-radius:1.1rem; overflow:hidden;
+header{position:relative; flex:0 0 auto; background:var(--punainen); color:#fff; border-radius:1.1rem; overflow:hidden;
   padding:1.1rem 1.4rem 1.25rem; box-shadow:var(--shadow)}
 header::after{content:""; position:absolute; left:0; right:0; bottom:0; height:.3rem;
   background:linear-gradient(90deg,var(--punainen) 0%,var(--oranssi) 42%,var(--kulta) 100%)}
@@ -65,7 +66,7 @@ h1 .n{color:var(--kulta)}
 .state .big{font-size:3.4rem; margin-bottom:.5rem}
 .state .t{font-weight:800; font-size:1.6rem; color:var(--meri)}
 .state .d{max-width:40rem; margin:.5rem auto 0; line-height:1.4}
-.state .btn{display:inline-block; margin-top:1rem; background:var(--metsa); color:var(--savu); text-decoration:none; font-weight:800; padding:.7rem 1.4rem; border-radius:999px}
+.state .btn{display:inline-block; margin-top:1rem; background:var(--forest); color:var(--savu); text-decoration:none; font-weight:800; padding:.7rem 1.4rem; border-radius:999px}
 .spin{display:inline-block; width:1rem; height:1rem; border:.2rem solid #d8cfba; border-top-color:var(--oranssi); border-radius:50%; animation:sp .8s linear infinite; vertical-align:-.15rem}
 @keyframes sp{to{transform:rotate(360deg)}}
 </style>
@@ -75,7 +76,7 @@ h1 .n{color:var(--kulta)}
   <header>
     <div class="htop">
       <div>
-        <div class="brandtag">Kaiku 2026 · Operaatiokeskus</div>
+        <div class="brandtag">ilves26 · Operaatiokeskus</div>
         <h1>Tiketit <span class="n">· Opke/Ospa</span></h1>
       </div>
       <div class="hstatus">
@@ -93,9 +94,9 @@ h1 .n{color:var(--kulta)}
 const API = '/api/tickets';
 const SP_URL = 'https://partio.sharepoint.com/sites/Tiketin/Lists/OpkeOspa/AllItems.aspx?viewid=6ab91000-1635-4e47-b2a8-cb248f338cff';
 const BUCKET_COLORS = {
-  'Uusi':'#FF633A', 'Käsittelemättömät':'#FF8940', 'Odottaa myöhempää käsittelyä':'#FFAE40',
-  'Käsittelyssä operaatiokeskuksessa':'#005448', 'Käsittelyssä muilla':'#00445E',
-  'Valmis':'#7a9b6f', 'Ei käsitellä':'#542337'
+  'Uusi':'#CE5738', 'Käsittelemättömät':'#D9744A', 'Odottaa myöhempää käsittelyä':'#D39C2F',
+  'Käsittelyssä operaatiokeskuksessa':'#80884f', 'Käsittelyssä muilla':'#6b4a34',
+  'Valmis':'#5f6b3f', 'Ei käsitellä':'#3b2a20'
 };
 const esc = s => (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function fmt(iso){ if(!iso) return ''; const d=new Date(iso); return `${d.getDate()}.${d.getMonth()+1}. ${String(d.getHours()).padStart(2,'0')}.${String(d.getMinutes()).padStart(2,'0')}`; }

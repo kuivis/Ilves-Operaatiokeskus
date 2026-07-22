@@ -1,9 +1,22 @@
-# Kaiku 2026 · Operaatiokeskus
+# ilves26 · Operaatiokeskus
 
-A single-page TV dashboard for the **Kaiku 2026** scout camp operations centre
-(*operaatiokeskus*), built in the Kaiku 2026 visual identity. Everything lives in one
-self-contained `index.html` (HTML + CSS + vanilla JS, no build step) sized for a
-1920×1080 TV.
+A single-page TV dashboard for the **ilves26** scout camp operations centre
+(*operaatiokeskus*) — **Hämeen Partiopiirin leiri, Evo 23.–31.7.2026** — built in the
+**ilves26** visual identity (Brändiopas v0.2). Everything lives in one self-contained
+`index.html` (HTML + CSS + vanilla JS, no build step) sized for a 1920×1080 TV.
+
+> **This is a fork of [Operaatiokeskus](https://github.com/samvaol/operaatiokeskus)**,
+> re-skinned to the ilves26 brand. The dashboard structure and the `ticket-server` are
+> unchanged; the visual identity (colours, typography, logo, wave, camp dates) is ilves26.
+>
+> **Brand:** red `#CE5738`, green `#80884f`, gold `#D39C2F`, black `#101010`, cream
+> `#F5F1E8`; type **Nunito** (headings) + **Jost** (body); logos in [`assets/`](assets/).
+>
+> **Data-source caveat:** the live data endpoints are inherited from the Kaiku deployment —
+> weather/radar are Evo (correct for ilves26), but **news** still reads the Kaiku app API and
+> **tickets/Osallistujaviestintä** still point at Kaiku's SharePoint. Repoint these for the
+> real ilves26 deployment (see `CLAUDE.md`). A Microsoft Planner/Teams board is a candidate
+> future source for tasks.
 
 ## Panels
 

@@ -1,9 +1,30 @@
-# Operaatiokeskus — project guide
+# ilves26 · Operaatiokeskus — project guide
 
-A single-page **TV dashboard** for the **Kaiku 2026** scout-camp operations centre, plus a
-small **Node ticket-server** that feeds it SharePoint tickets. Everything is Finnish-first
-and uses the **Kaiku 2026 V1** visual identity. Sibling projects: `../Leirilukkari`,
-`../Leirikartta` (both embeddable HTML).
+A single-page **TV dashboard** for the **ilves26** scout-camp operations centre (Hämeen
+Partiopiirin leiri, **Evo 23.–31.7.2026**), plus a small **Node ticket-server** that feeds it
+SharePoint tickets. Everything is Finnish-first and uses the **ilves26** visual identity
+(Brändiopas v0.2).
+
+> **Fork of `samvaol/operaatiokeskus`** re-skinned to ilves26. Structure, data logic and the
+> `ticket-server` are unchanged from upstream — only the visual identity differs.
+
+## ilves26 visual identity (overrides the palette/type notes below)
+- **Colours (only these — no blue):** red `#CE5738` (signature / header / attention),
+  green `#80884f` (structural) + deep `#414a2c` for dark cards, gold `#D39C2F` (camp
+  heartbeat / hero), cream `#F5F1E8` (bg), black `#101010`. Same 4-role discipline as
+  upstream: `--kulta`=heartbeat, `--punainen`=attention, `--metsa`/green=structural,
+  environment folds into green (no blue in the brand).
+- **Type:** **Nunito** for headings/display/UI (900 *italic* for the greeting — the brand's
+  signature black-italic voice); **Jost** for body/reading text (`--body`). Both from Google
+  Fonts.
+- **Logo:** `assets/ilves26-logo-valk.svg` (forest-badge mark + white "ilves26" wordmark) in
+  the header; other cuts in `assets/`. **Header** is solid red with faint tree silhouettes and
+  a cream **scalloped wave** bottom edge (the brand aaltoviiva) — this is wanted here (unlike
+  upstream, where the header wave was removed).
+- **Camp dates:** `CAMP_START`/`CAMP_END` = 23.–31.7.2026 (Evo).
+- **Data caveat:** news still hits the Kaiku app API and tickets/form still point at Kaiku's
+  SharePoint — repoint for the real ilves26 deployment. Microsoft Planner/Teams is a candidate
+  future task source.
 
 ## ⚠️ Read first
 - The dashboard is **one self-contained `index.html`** — HTML + CSS + vanilla JS, **no
