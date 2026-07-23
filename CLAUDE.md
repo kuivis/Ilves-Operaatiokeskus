@@ -80,37 +80,30 @@ ticket-server/
 
 Every source has an **embedded fallback** so the dashboard never goes blank.
 
-## Ticket server (Microsoft Planner)
-- The board (*Operaatiokeskus tehtävät*, `PLAN_ID=w2Y2pqVlOkKDXrV2TiaYxJYAF5oR`) is read via
-  **Microsoft Graph** `/planner/plans/{planId}/buckets` + `/tasks`. On start the Node server opens
-  the **Planner board in a visible Playwright window** (`plannerPage`) — you log in once with your
-  Microsoft account (session persists in `.auth`).
-- **Auth = a Graph bearer token, not cookies** (Graph needs a token). `planner.cloud.microsoft`
-  does **not** cache a readable Graph token (an MSAL-storage read returned nothing — confirmed on
-  the user's machine, `diag: "ei Graph-tokenia MSAL-välimuistissa"`). So instead a **network
-  sniffer** (`attachSniffer`) captures the app's own `Authorization: Bearer` tokens from its
-  requests, decodes each JWT's `aud`/`scp` (`decodeJwt`), and `pickGraphToken` picks one whose
-  `aud=graph.microsoft.com` and scope is Planner-capable (`group`/`tasks`/`planner`/`.default`).
-  Graph is then called Node-side with `context.request.get` (no CORS). Fallback: it also captures
-  the app's own **task/bucket response bodies** (`useCapturedGraphResponses`) in case they're
-  Graph-shaped. Each 60 s poll **reloads `plannerPage`** (then ~3.5 s settle) so the app re-fetches
-  and the sniffer sees fresh tokens/data. **`GET /api/debug`** dumps the captured token audiences +
-  scopes, seen data URLs, and captured response shapes — the tool for diagnosing whether the app
-  even issues a Planner-scoped Graph token (if it only uses the **taskmars** backend, we'd pivot to
-  that or to an Azure app registration).
-- `groupByBucket` maps `bucketId → name` and orders columns by `BUCKET_ORDER` (`Uudet tehtävät`,
-  `Työn alla`, `Valmis`, …); `mapTask` → the ticket shape (`id` = last 4 of the task id;
-  `safety` = Planner priority 1–3; tasks sorted by `orderHint`).
+## Ticket server (Microsoft Planner — DOM scrape)
+- The board (*Operaatiokeskus tehtävät*, `PLAN_ID=w2Y2pqVlOkKDXrV2TiaYxJYAF5oR`) is read by
+  **scraping the rendered board** — no Graph/token. `planner.cloud.microsoft` doesn't cache a
+  readable Graph token and reads its data from Microsoft's internal *taskmars* backend, so token/
+  Graph approaches failed (`diag: "ei Graph-tokenia…"`). On start the Node server opens the **board
+  in a visible Playwright window** (`plannerPage`) — you log in once (session persists in `.auth`).
+- **`scrapeBoard(page)`** reads the DOM by **aria-labels** (works FI + EN): columns are found via
+  the add-card buttons (`"Lisää tehtäväkortti sarakkeeseen {bucket}"` / `"Add task to bucket …"`),
+  and each column's container = the largest ancestor holding exactly that one add-button; task
+  cards inside it are `aria-label=" Tehtävä {title} "` (`"Task {title}"`). `buildBuckets` orders by
+  `BUCKET_ORDER` (`Uudet tehtävät`, `Työn alla`, **`Valmiit`**, …); `mapScraped` → the ticket shape
+  (`id` = short hash of the title; no priority/date from scraping). **Verified against the real
+  saved board DOM** (`Operaatiokeskus tehtävät.html`) — it extracted the columns + tasks correctly.
+- Each 60 s poll **reloads `plannerPage`**, waits for the board to render (`waitForFunction` on an
+  add-card button, ~30 s), then scrapes. First poll skips the reload (`goto` just loaded it).
 - Serves `GET /api/tickets` (CORS `*`) → `{status:'ok'|'awaiting-login'|'error', buckets:[…],
-  uusi:[…], count, diag}`. **`uusi` = the `Uudet tehtävät` bucket.** Dashboard's Uudet-tiketit
-  panel reads `j.uusi`; the **Käsittelyssä** panel (`opsFrom`) pulls the **`Työn alla`** bucket;
+  uusi:[…], count, diag}`. **`uusi` = the `Uudet tehtävät` column.** Dashboard's Uudet-tiketit
+  panel reads `j.uusi`; the **Käsittelyssä** panel (`opsFrom`) pulls the **`Työn alla`** column;
   the popup reads `j.buckets`. Override host with `?ticketApi=`, plan with env `PLAN_ID`.
-- **Diagnose** via `GET /api/health` / the `diag` field + the server console `[planner]` lines:
-  `awaiting-login` (+ "ei Graph-tokenia") = not logged in / no Graph-scoped token yet;
-  `buckets HTTP 403` = the session's Graph token lacks Planner scope (needs Group/Tasks read —
-  may require consent or an app registration); `HTTP 404` = wrong `PLAN_ID`.
+- **Diagnose** via `GET /api/debug` (add-button labels found, task-card count, per-column titles,
+  and a `sampleLabels` dump) + `[planner]` console lines. `awaiting-login` + "ei sarakkeita luettu"
+  = login not finished / board didn't render / the aria-labels changed (check `sampleLabels`).
 - Startup is guarded by `if (require.main === module) start()`; `module.exports` exposes
-  `mapTask`/`groupByBucket`/`getGraphToken` for unit tests (no Playwright needed).
+  `shortId`/`mapScraped`/`buildBuckets` for unit tests (no Playwright needed).
 - Run: `cd ticket-server && npm install && npm start`. `HEADLESS=1` runs headless (only works
   once `.auth` is warm). Session persists in `ticket-server/.auth` (git-ignored, secret).
 

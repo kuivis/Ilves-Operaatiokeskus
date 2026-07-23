@@ -94,7 +94,7 @@ h1 .n{color:var(--kulta)}
 const API = '/api/tickets';
 const SP_URL = 'https://planner.cloud.microsoft/webui/plan/w2Y2pqVlOkKDXrV2TiaYxJYAF5oR/view/board';
 const BUCKET_COLORS = {
-  'Uudet tehtävät':'#CE5738', 'Työn alla':'#D39C2F', 'Valmis':'#80884f', 'Tehty':'#80884f', 'Done':'#80884f'
+  'Uudet tehtävät':'#CE5738', 'Työn alla':'#D39C2F', 'Valmiit':'#80884f', 'Valmis':'#80884f', 'Tehty':'#80884f', 'Done':'#80884f'
 };
 const esc = s => (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function fmt(iso){ if(!iso) return ''; const d=new Date(iso); return `${d.getDate()}.${d.getMonth()+1}. ${String(d.getHours()).padStart(2,'0')}.${String(d.getMinutes()).padStart(2,'0')}`; }

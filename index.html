@@ -79,7 +79,6 @@ main{
 .card.weather{--accent:var(--meri)}
 .card.radar{--accent:var(--meri)}
 .card.tickets{--accent:var(--punainen)}   /* uudet tiketit = huomio */
-.card.shift{--accent:var(--metsa)}
 .card.sched{--accent:var(--metsa)}
 .card.news{--accent:var(--metsa)}
 .card.ops{--accent:var(--metsa)}
@@ -247,26 +246,10 @@ main{
 .art .by{font-size:.78rem; color:#a49f92; margin-top:auto; font-weight:600}
 .art + .art{border-top:1px solid #efe6d3; padding-top:.85rem}
 
-/* ===== Työvuoro-kortti ===== */
-.shift{min-height:0}
-.shiftnow{display:flex; gap:.8rem}
-.shiftcard{flex:1 1 0; background:#f6efdf; border-radius:.9rem; padding:.85rem .9rem; display:flex; flex-direction:column; gap:.35rem;
-  border-left:.4rem solid var(--accent,var(--oranssi))}
-.shiftcard .role{font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#9a958a}
-.shiftcard .name{font-size:1.7rem; font-weight:800; line-height:1; color:var(--meri)}
-.shiftcard.empty .name{color:#c4bfb2; font-size:1.15rem}
-.shifttask{margin-top:.85rem; background:rgba(0,84,72,.08); border-radius:.8rem; padding:.7rem .9rem;
-  display:flex; gap:.6rem; align-items:center; font-size:1rem}
-.shifttask .ic{font-size:1.3rem}
-.shifttask b{color:var(--metsa)}
-.shiftnext{margin-top:.7rem; font-size:.92rem; color:#7a766c; display:flex; align-items:center; gap:.5rem}
-.shiftnext .tg{font-weight:800; color:var(--metsa)}
 
 /* Metatiedon pienet ikonit (korvaavat emojit tiketti-/viesti-riveillä) */
 .mi{width:.92rem; height:.92rem; fill:none; stroke:currentColor; stroke-width:1.85;
   stroke-linecap:round; stroke-linejoin:round; vertical-align:-.14rem; margin-right:.28rem; flex:0 0 auto}
-.shifttask .ti{width:1.2rem; height:1.2rem; fill:none; stroke:var(--metsa); stroke-width:1.85;
-  stroke-linecap:round; stroke-linejoin:round; flex:0 0 auto}
 .modal-h .mt-ic{width:1.4rem; height:1.4rem; fill:none; stroke:currentColor; stroke-width:1.9;
   stroke-linecap:round; stroke-linejoin:round; flex:0 0 auto}
 
@@ -329,7 +312,6 @@ main{
 <!-- Kuratoitu viivaikonisto (yksi tyyli, sama viivanpaksuus) — korvaa emojit -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/></symbol>
-  <symbol id="i-shift" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.1"/><path d="M3.6 19.4a5.5 5.5 0 0 1 10.8 0"/><path d="M15.5 5.2a3.1 3.1 0 0 1 0 5.7"/><path d="M17 13.6a5.5 5.5 0 0 1 3.4 5"/></symbol>
   <symbol id="i-ticket" viewBox="0 0 24 24"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h13A1.5 1.5 0 0 1 20 8.5a2 2 0 0 0 0 4A1.5 1.5 0 0 1 18.5 14h-13A1.5 1.5 0 0 1 4 12.5a2 2 0 0 0 0-4z"/><path d="M14 7.5v6" stroke-dasharray="1.3 2"/></symbol>
   <symbol id="i-weather" viewBox="0 0 24 24"><circle cx="8" cy="8" r="2.5"/><path d="M8 3.6v1.1M3.6 8h1.1M4.9 4.9l.8.8M11.1 4.9l-.8.8"/><path d="M9.5 19h7.5a3.1 3.1 0 0 0 .3-6.2A4.5 4.5 0 0 0 8.7 12.2 3.4 3.4 0 0 0 9.5 19z"/></symbol>
   <symbol id="i-radar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.2"/><path d="M12 12 18.5 8.2"/><circle cx="12" cy="12" r="1"/></symbol>
@@ -370,7 +352,7 @@ main{
 
   <!-- ===================== RUNKO ===================== -->
   <main>
-    <!-- SARAKE 1: leirikello + työvuoro + uudet tiketit -->
+    <!-- SARAKE 1: leirikello + uudet tiketit -->
     <div class="col">
       <div class="card forest timer" style="flex:0 0 auto">
         <div class="inner">
@@ -389,10 +371,6 @@ main{
         </div>
       </div>
 
-      <div class="card shift" style="flex:0 0 auto">
-        <div class="card-h"><span class="ic"><svg aria-hidden="true"><use href="#i-shift"/></svg></span><h2>Työvuorossa nyt</h2><span class="sub" id="shiftDay">–</span></div>
-        <div id="shiftBody" class="muted">Ladataan työvuoroja…</div>
-      </div>
 
       <div class="card tickets" style="flex:1 1 auto">
         <div class="card-h"><span class="ic"><svg aria-hidden="true"><use href="#i-ticket"/></svg></span><h2>Uudet tiketit</h2><span class="sub" id="uusiStatus">–</span></div>
@@ -832,46 +810,6 @@ function setupAutoScroll(){
   }, 40);
 }
 
-/* ============ TYÖVUOROT (Operaatiokeskuksen työvuorolista.xlsx) ============ */
-const WORKSHIFTS = {"2026-07-10":[{"t":"07:00","s1":"Anniina","s2":"Sampo"},{"t":"12:00","s1":"Eveliina","s2":"Jenni"},{"t":"16:00","y":"Operaatiokeskuksen päiväpalaveri"},{"t":"17:00","s1":"Sakari","s2":"Huugo"},{"t":"20:00","y":"Aamuraportin valmistelu"}],"2026-07-11":[{"t":"07:00","s1":"Jenni","s2":"Huugo"},{"t":"08:00","y":"Aamuraportin tarkistus"},{"t":"09:30","y":"LTMK kokous, opkemestari"},{"t":"12:00","s1":"Anniina","s2":"Eveliina"},{"t":"16:00","y":"Operaatiokeskuksen päiväpalaveri"},{"t":"17:00","s1":"Sampo","s2":"Sakari"},{"t":"20:00","y":"Aamuraportin valmistelu"}],"2026-07-12":[{"t":"07:00","s1":"Eveliina","s2":"Jenni"},{"t":"08:00","y":"Aamuraportin tarkistus"},{"t":"09:30","y":"LTMK kokous, opkemestari"},{"t":"12:30","s1":"Anniina","s2":"Sakari"},{"t":"16:00","y":"Operaatiokeskuksen päiväpalaveri"},{"t":"18:00","s1":"Huugo","s2":"Sampo"},{"t":"20:00","y":"Aamuraportin valmistelu"}],"2026-07-13":[{"t":"07:00","s1":"Eveliina","s2":"Jenni"},{"t":"08:00","y":"Aamuraportin tarkistus"},{"t":"09:30","y":"LTMK kokous, opkemestari"},{"t":"12:30","s1":"Anniina","s2":"Sampo"},{"t":"16:00","y":"Operaatiokeskuksen päiväpalaveri"},{"t":"18:00","s1":"Sakari","s2":"Huugo"},{"t":"20:00","y":"Aamuraportin valmistelu"}],"2026-07-14":[{"t":"07:00","s1":"Sampo","s2":"Huugo"},{"t":"08:00","y":"Aamuraportin tarkistus"},{"t":"09:30","y":"LTMK kokous, opkemestari"},{"t":"15:30","s1":"Anniina","s2":"Sakari"},{"t":"16:00","y":"Operaatiokeskuksen päiväpalaveri"},{"t":"20:00","y":"Aamuraportin valmistelu"}],"2026-07-15":[{"t":"07:00","s1":"Anniina","s2":"Huugo"},{"t":"08:00","y":"Aamuraportin tarkistus"},{"t":"09:30","y":"LTMK kokous, opkemestari"},{"t":"15:30","s1":"Sakari","s2":"Sampo"},{"t":"16:00","y":"Operaatiokeskuksen päiväpalaveri"},{"t":"20:00","y":"Aamuraportin valmistelu"}],"2026-07-16":[{"t":"07:00","s1":"Anniina","s2":"Sampo"},{"t":"08:00","y":"Aamuraportin tarkistus"},{"t":"08:30","s2":"Sakari"},{"t":"09:30","y":"LTMK kokous, opkemestari"},{"t":"15:30","s1":"Huugo"},{"t":"16:00","y":"Operaatiokeskuksen päiväpalaveri"},{"t":"18:00","s2":"Sampo"},{"t":"20:00","y":"Aamuraportin valmistelu"}],"2026-07-17":[{"t":"07:00","s1":"Sampo","s2":"Huugo"},{"t":"08:00","y":"Aamuraportin tarkistus"},{"t":"09:30","y":"LTMK kokous, opkemestari"},{"t":"15:30","s1":"Sakari","s2":"Anniina"},{"t":"16:00","y":"Operaatiokeskuksen päiväpalaveri"},{"t":"20:00","y":"Aamuraportin valmistelu"}],"2026-07-18":[{"t":"07:00","s1":"Huugo","s2":"Anniina"},{"t":"08:00","y":"Aamuraportin tarkistus"},{"t":"09:30","y":"LTMK kokous, opkemestari"},{"t":"12:30","s1":"Sampo","s2":"Sakari"},{"t":"16:00","y":"Operaatiokeskuksen päiväpalaveri"}]};
-function prevDayKey(key){
-  const d = new Date(key+'T12:00:00'); d.setDate(d.getDate()-1);
-  return d.toISOString().slice(0,10);
-}
-function carryShift(entries, until){ // until = "HH:MM" tai null = koko päivä
-  let s1=null, s2=null, y=null, next=null;
-  for (const e of entries){
-    if (until===null || e.t <= until){ if('s1' in e)s1=e.s1; if('s2' in e)s2=e.s2; if('y' in e)y=e.y; }
-    else if (!next && ('s1' in e || 's2' in e)){ next=e; }
-  }
-  return { s1, s2, y, next };
-}
-function renderShift(){
-  const el = document.getElementById('shiftBody');
-  const key = helParts(Date.now()).date;
-  const dObj = new Date(new Date().toLocaleString('en-US',{timeZone:TZ}));
-  document.getElementById('shiftDay').textContent = `${dObj.getDate()}.${dObj.getMonth()+1}.`;
-  const entries = WORKSHIFTS[key];
-  if (!entries){ el.innerHTML = '<div class="muted">Leirin ulkopuolinen päivä — ei työvuoroja.</div>'; return; }
-  const now = helParts(Date.now()).hm;
-  const cur = carryShift(entries, now);
-  // ennen aamuvuoroa → edellisillan vuoro jatkuu yön yli
-  if (cur.s1===null && cur.s2===null){
-    const p = WORKSHIFTS[prevDayKey(key)];
-    if (p){ const pc = carryShift(p, null); cur.s1 = pc.s1; cur.s2 = pc.s2; }
-  }
-  const nameCard = (role, name, accent) => name
-    ? `<div class="shiftcard" style="--accent:${accent}"><div class="role">${role}</div><div class="name">${name}</div></div>`
-    : `<div class="shiftcard empty" style="--accent:#c4bfb2"><div class="role">${role}</div><div class="name">— ei merkintää —</div></div>`;
-  let html = `<div class="shiftnow">${nameCard('1. vuoro', cur.s1, 'var(--oranssi)')}${nameCard('2. vuoro', cur.s2, 'var(--meri)')}</div>`;
-  if (cur.y) html += `<div class="shifttask"><svg class="ti" aria-hidden="true"><use href="#i-pin"/></svg><div>Meneillään: <b>${cur.y}</b></div></div>`;
-  if (cur.next){
-    const nn = [cur.next.s1, cur.next.s2].filter(Boolean).join(' & ');
-    html += `<div class="shiftnext">${mi('swap')}Seuraava vuoronvaihto <span class="tg">klo ${cur.next.t.replace(':','.')}</span>${nn?` — ${nn}`:''}</div>`;
-  }
-  el.innerHTML = html;
-}
-
 /* ============ TIKETIT-POPUP (tiketti-palvelimelta, vain "Uusi") ============ */
 // Erillinen node-palvelin (ticket-server) lukee tehtävät Plannerista (MS Graph) ja
 // tarjoaa ne CORS-avoimena. Osoitteen voi ohittaa ?ticketApi=... -parametrilla.
@@ -1070,7 +1008,7 @@ function showCelebrateToast(pct){
 
 /* ============ TIKETIT-POPUP: kaikki statukset ============ */
 // Planner-sarakkeiden värit (ilves26-paletti)
-const BUCKET_COLORS = { 'Uudet tehtävät':'#CE5738','Työn alla':'#D39C2F','Valmis':'#80884f','Tehty':'#80884f','Done':'#80884f' };
+const BUCKET_COLORS = { 'Uudet tehtävät':'#CE5738','Työn alla':'#D39C2F','Valmiit':'#80884f','Valmis':'#80884f','Tehty':'#80884f','Done':'#80884f' };
 function ticketCard(t, statusName){
   const meta = [ t.topic?`${mi('tag')}${esc(t.topic)}`:'', t.location?`${mi('pin')}${esc(t.location)}`:'', t.reporter?`${mi('user')}${esc(t.reporter)}`:'', t.created?`${mi('clock')}${fmtDate(t.created)}`:'' ]
     .filter(Boolean).map(m=>`<span>${m}</span>`).join('');
@@ -1098,11 +1036,10 @@ function renderBuckets(buckets){
 }
 
 /* ============ KÄYNNISTYS ============ */
-tickClock(); tickTimer(); renderSchedule(); renderShift();
+tickClock(); tickTimer(); renderSchedule();
 setInterval(tickClock, 1000);
 setInterval(tickTimer, 1000);
 setInterval(renderSchedule, 30000);       // päivitä nyt/seuraava-merkinnät
-setInterval(renderShift, 30000);          // päivitä työvuorossa-nyt
 loadWeather();      setInterval(loadWeather, 10*60*1000);   // 10 min
 loadNews();         setInterval(loadNews, 5*60*1000);       // 5 min
 loadUusi();         setInterval(loadUusi, 60000);           // 60 s — uudet tehtävät + käsittelyssä (Planner)
