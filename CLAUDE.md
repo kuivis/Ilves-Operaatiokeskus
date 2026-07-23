@@ -88,8 +88,10 @@ Every source has an **embedded fallback** so the dashboard never goes blank.
 - **Auth = a Graph bearer token, not cookies** (Graph needs a token). `getGraphToken(page)` reads
   the page's **MSAL cache** (local/sessionStorage) for an `AccessToken` credential whose scope
   looks Planner-capable (`group.*` / `tasks.*` / `.default`) and returns its `secret`; Graph is
-  then called with `context.request.get` + `Authorization: Bearer` (Node-side, no CORS). If the
-  token is near expiry or a call 401s, it reloads `plannerPage` so MSAL refreshes silently.
+  then called with `context.request.get` + `Authorization: Bearer` (Node-side, no CORS). Each 60 s
+  poll **reloads `plannerPage`** first (then a ~2.5 s settle) so the session stays alive and MSAL
+  keeps the token fresh — like the Planner board refreshing itself (first poll skips the reload
+  since `goto` just loaded it).
 - `groupByBucket` maps `bucketId → name` and orders columns by `BUCKET_ORDER` (`Uudet tehtävät`,
   `Työn alla`, `Valmis`, …); `mapTask` → the ticket shape (`id` = last 4 of the task id;
   `safety` = Planner priority 1–3; tasks sorted by `orderHint`).

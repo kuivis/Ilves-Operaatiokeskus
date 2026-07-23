@@ -35,6 +35,7 @@ const BUCKET_ORDER = ['Uudet tehtävät', 'Työn alla', 'Valmis', 'Tehty', 'Done
 const state = { status: 'starting', buckets: [], uusi: [], count: 0, updatedAt: null, error: null, diag: null };
 let context = null;
 let plannerPage = null;
+let firstPoll = true;
 
 // --- Graph-token kirjautuneen istunnon MSAL-välimuistista ---
 // Etsitään AccessToken-credential, jonka scope viittaa Planner-lukuun
@@ -106,22 +107,23 @@ function groupByBucket(tasks, bucketMap) {
 async function poll() {
   if (!context || !plannerPage) return;
   try {
+    // Päivitä Planner-sivu joka kierros (60 s) — pitää istunnon elossa ja MSAL-tokenin
+    // tuoreena (aivan kuten Planner-taulu itsekin päivittyy). Ensimmäisellä kerralla
+    // sivu on juuri ladattu (goto), joten reload ohitetaan.
+    if (!firstPoll) await plannerPage.reload({ waitUntil: 'domcontentloaded', timeout: 60000 }).catch(() => {});
+    firstPoll = false;
+    await plannerPage.waitForTimeout(2500).catch(() => {}); // anna MSAL/appin asettua
     // 1) Graph-token kirjautuneesta istunnosta
     const tok = await getGraphToken(plannerPage).catch(() => null);
     if (!tok || !tok.token) {
       state.status = 'awaiting-login'; state.error = null; state.diag = 'ei Graph-tokenia MSAL-välimuistissa';
       console.log('[planner] ei Graph-tokenia — kirjaudu avautuneessa Planner-ikkunassa'); return;
     }
-    if (tok.exp && tok.exp * 1000 < Date.now() + 30000) {
-      // token vanhentumassa → lataa Planner-sivu uudelleen, jotta MSAL uusii sen
-      await plannerPage.reload({ waitUntil: 'domcontentloaded' }).catch(() => {});
-      console.log('[planner] token vanhentumassa — päivitetään istunto');
-    }
     // 2) sarakkeet
     const bk = await graphGet(tok.token, `/planner/plans/${PLAN_ID}/buckets`);
     if (!bk.ok) {
       state.diag = `buckets HTTP ${bk.status} (scope: ${tok.target.slice(0, 60)})`;
-      if (bk.status === 401) { state.status = 'awaiting-login'; state.error = null; await plannerPage.reload({ waitUntil: 'domcontentloaded' }).catch(() => {}); }
+      if (bk.status === 401) { state.status = 'awaiting-login'; state.error = null; } // seuraava kierros lataa sivun ja uusii tokenin
       else { state.status = 'error'; state.error = `Graph buckets ${bk.status} — tarkista oikeudet/PLAN_ID`; }
       console.log(`[planner] buckets HTTP ${bk.status} — ${state.diag}`); return;
     }
