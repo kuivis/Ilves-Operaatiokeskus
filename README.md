@@ -12,11 +12,11 @@ A single-page TV dashboard for the **ilves26** scout camp operations centre
 > **Brand:** red `#CE5738`, green `#80884f`, gold `#D39C2F`, black `#101010`, cream
 > `#F5F1E8`; type **Nunito** (headings) + **Jost** (body); logos in [`assets/`](assets/).
 >
-> **Data sources:** weather/radar (Evo), **news** (ilves26 app — Tiedotteet + Ilves NYT) and
-> the **schedule** (ilves26 app *Aikataulu*, showing **Havus → Vaeltaja/Aikuinen**) are all
-> live from ilves26. Only **tickets/Osallistujaviestintä** still point at Kaiku's SharePoint via
-> the `ticket-server` — repoint those for the real ilves26 deployment (see `CLAUDE.md`). A
-> Microsoft Planner/Teams board is a candidate future source for tasks.
+> **Data sources (all ilves26):** weather/radar (Evo); **news** (ilves26 app — Tiedotteet +
+> Ilves NYT); the **schedule** (ilves26 app *Aikataulu* `ICS_BUNDLE`, **embedded** — showing
+> **Havus → Vaeltaja/Aikuinen**); and **tickets** from a **Microsoft Planner** board via the
+> `ticket-server` (**Uudet tiketit** ← *Uudet tehtävät* column, **Käsittelyssä** ← *Työn alla*).
+> The Osallistujaviestintä panel was removed. See `CLAUDE.md` for details.
 
 ## Panels
 
@@ -29,12 +29,10 @@ A single-page TV dashboard for the **ilves26** scout camp operations centre
 - **Sadetutka · Evo** — live FMI weather radar (Leaflet map) centred on Evo, refreshed every 5 min.
 - **Päivän ohjelma** — today's whole-camp programme with *nyt* / *seuraava* markers.
 - **Työvuorossa nyt** — who is on shift right now (from the työvuorolista).
-- **Uudet tiketit** — the "Uusi" SharePoint tickets, always on screen, refreshed every 60 s.
-- **Käynnissä olevat operaatiot** — the "Käsittelyssä operaatiokeskuksessa" tickets, refreshed every 60 s.
-- **Pääuutiset** — the latest articles from the Kaiku 2026 app.
-- **Osallistujaviestintä** — the three latest entries from the participant-messaging form
-  (a SharePoint Excel workbook), refreshed live every 60 s via the `ticket-server`.
-- **Tiketit** (🎫 button) — a popup of the full board, **all status columns** grouped.
+- **Uudet tiketit** — the **Uudet tehtävät** Planner column, always on screen, refreshed every 60 s.
+- **Käsittelyssä** — the **Työn alla** Planner column, refreshed every 60 s.
+- **Uutiset** — the latest articles from the ilves26 app (Tiedotteet + Ilves NYT).
+- **Tehtävät** (🎫 button) — a popup of the full Planner board, **all columns** grouped.
 
 ## Data sources
 
@@ -42,40 +40,28 @@ A single-page TV dashboard for the **ilves26** scout camp operations centre
 |-------|--------|
 | Weather + forest-fire | Ilmatieteen laitos open data (WFS) |
 | Sadetutka (radar) | FMI radar WMS (`Radar:suomi_dbz_eureffin`) + Leaflet/CARTO base |
-| Pääuutiset | Kaiku 2026 app content API (Corego / GoodBarber) |
-| Päivän ohjelma | Leirilukkari camp schedule + embedded snapshot |
-| Työvuorot | `Operaatiokeskuksen työvuorolista.xlsx` (embedded) |
-| Tiketit (kaikki tilat) | SharePoint list *Opke/Ospa*, all statuses, via the local `ticket-server` |
-| Osallistujaviestintä | SharePoint Excel workbook *Osallistujaviestintä.xlsx*, 3 latest rows, via the local `ticket-server` |
+| Uutiset | ilves26 app content API (Corego / GoodBarber) — Tiedotteet + Ilves NYT |
+| Päivän ohjelma | ilves26 app *Aikataulu* `ICS_BUNDLE` (embedded) — Havus → Vaeltaja/Aikuinen |
+| Tehtävät (Uudet tiketit / Käsittelyssä) | **Microsoft Planner** board, via the local `ticket-server` |
 
-Each source has an embedded fallback so the dashboard keeps working offline.
+## Tickets — the `ticket-server` (Microsoft Planner)
 
-## Tickets — the `ticket-server`
+Tickets come from a **Microsoft Planner** board (*Operaatiokeskus tehtävät*). The
+[`ticket-server/`](ticket-server/) folder is a small Node backend that reads it:
 
-A browser cannot read the SharePoint list directly: SharePoint returns
-`Access-Control-Allow-Origin: *` **without** `Access-Control-Allow-Credentials`, so it
-won't accept the login cookie cross-origin. The [`ticket-server/`](ticket-server/)
-folder solves this with a small Node backend:
-
-1. On start it opens a **browser window to the Tiketin site — you log in once** with your
-   partio account (the session is saved to `ticket-server/.auth`, so you don't log in
+1. On start it opens a **browser window to the Planner board — you log in once** with your
+   Microsoft account (the session is saved to `ticket-server/.auth`, so you don't log in
    again next time).
-2. It then reads **all tickets** from the *Opke/Ospa* list every **60 s** and groups them
-   by status (Uusi, Käsittelemättömät, … Valmis), by calling the SharePoint REST API with
-   Playwright's `context.request` (which carries the logged-in cookies — immune to which
-   browser tab is open).
+2. It then reads the plan's **tasks + buckets** every **60 s** via **Microsoft Graph**
+   (`/planner/plans/{planId}/tasks` + `/buckets`), authenticated with the Graph access token
+   from the logged-in session's MSAL cache, and groups tasks by their Planner column.
 3. It serves them CORS-open at `http://localhost:8137/api/tickets` (`{status, buckets,
-   uusi, …}`), plus a Kaiku-styled **all-statuses board** at `http://localhost:8137/`.
+   uusi, …}`; **`uusi` = the *Uudet tehtävät* column**), plus an ilves-styled **board** at
+   `http://localhost:8137/`. Diagnostics at `http://localhost:8137/api/health`.
 
-It also downloads the **Osallistujaviestintä** Excel workbook (on the
-`UudenmaanPiirileiri2026` site — the same partio login covers the whole tenant), parses it
-in-process (no dependencies — a small zip + OOXML reader), and serves the **three latest
-form responses** at `http://localhost:8137/api/form` (`{status, entries, …}`), refreshed
-every 60 s. Override the workbook with the `FORM_DOC_ID` env var if the file changes.
-
-The dashboard's 🎫 **Tiketit** popup reads that endpoint (override with
-`?ticketApi=http://HOST:8137/api/tickets`). If the server is down, the popup says so; if
-you haven't logged in yet, it says "Kirjaudu tiketti-palvelimen ikkunassa".
+The dashboard's **Uudet tiketit** panel shows *Uudet tehtävät*, **Käsittelyssä** shows *Työn
+alla*, and the 🎫 popup shows the full board. Override the plan with `PLAN_ID=<id>` and the
+API host with `?ticketApi=http://HOST:8137/api/tickets`.
 
 ```bash
 cd ticket-server

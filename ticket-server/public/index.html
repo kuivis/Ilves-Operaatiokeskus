@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#CE5738" />
-<title>Tiketit · ilves26</title>
+<title>Tehtävät · ilves26</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,900&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -77,7 +77,7 @@ h1 .n{color:var(--kulta)}
     <div class="htop">
       <div>
         <div class="brandtag">ilves26 · Operaatiokeskus</div>
-        <h1>Tiketit <span class="n">· Opke/Ospa</span></h1>
+        <h1>Tehtävät <span class="n">· Operaatiokeskus</span></h1>
       </div>
       <div class="hstatus">
         <div class="live"><span class="eq"><i></i><i></i><i></i><i></i></span> LIVE · 60 s</div>
@@ -92,11 +92,9 @@ h1 .n{color:var(--kulta)}
 
 <script>
 const API = '/api/tickets';
-const SP_URL = 'https://partio.sharepoint.com/sites/Tiketin/Lists/OpkeOspa/AllItems.aspx?viewid=6ab91000-1635-4e47-b2a8-cb248f338cff';
+const SP_URL = 'https://planner.cloud.microsoft/webui/plan/w2Y2pqVlOkKDXrV2TiaYxJYAF5oR/view/board';
 const BUCKET_COLORS = {
-  'Uusi':'#CE5738', 'Käsittelemättömät':'#D9744A', 'Odottaa myöhempää käsittelyä':'#D39C2F',
-  'Käsittelyssä operaatiokeskuksessa':'#80884f', 'Käsittelyssä muilla':'#6b4a34',
-  'Valmis':'#5f6b3f', 'Ei käsitellä':'#3b2a20'
+  'Uudet tehtävät':'#CE5738', 'Työn alla':'#D39C2F', 'Valmis':'#80884f', 'Tehty':'#80884f', 'Done':'#80884f'
 };
 const esc = s => (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function fmt(iso){ if(!iso) return ''; const d=new Date(iso); return `${d.getDate()}.${d.getMonth()+1}. ${String(d.getHours()).padStart(2,'0')}.${String(d.getMinutes()).padStart(2,'0')}`; }
@@ -126,8 +124,8 @@ function render(data){
     }).join('');
   } else if(data.status==='awaiting-login'){
     upd.textContent = 'Odottaa kirjautumista';
-    board.innerHTML = `<div class="state"><div class="big">🔒</div><div class="t">Kirjaudu SharePointiin</div>
-      <div class="d">Palvelin avasi selainikkunan Tiketin-sivustolle. Kirjaudu siinä partio-tunnuksilla — tiketit ilmestyvät tähän automaattisesti minuutin sisällä.</div>
+    board.innerHTML = `<div class="state"><div class="big">🔒</div><div class="t">Kirjaudu Planneriin</div>
+      <div class="d">Palvelin avasi selainikkunan Planner-tauluun. Kirjaudu siinä Microsoft-tunnuksilla — tehtävät ilmestyvät tähän automaattisesti minuutin sisällä.</div>
       <a class="btn" href="${SP_URL}" target="_blank" rel="noopener">Avaa kirjautuminen ↗</a></div>`;
   } else if(data.status==='error'){
     upd.textContent = 'Virhe';

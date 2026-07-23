@@ -18,11 +18,19 @@ Operaatiokeskus base; the ilves26 changes are visual only:
 - **News + schedule repointed to ilves26** (reverse-engineered the ilves26 GoodBarber/Corego app):
   - News merges **Tiedotteet** (`75180339`) + **Ilves NYT** (`77682659`) from
     `api.ww-api.com/front/get_items/4406427/…`, newest-first.
-  - Schedule reads the **Aikataulu** plugin's embedded `ICS_BUNDLE` (section `78357980`) and shows
-    **Havus → Vaeltaja/Aikuinen** = `vaeltaja-aikuinen.ics` + `yleiset.ics` (69 events; tiny UTC-ICS
-    parser, no RRULE). Configurable via `SCHED_AGE`/`SCHED_CAMP`.
-- **Still Kaiku:** tickets + Osallistujaviestintä (ticket-server → SharePoint) — repoint for the
-  real ilves26 deployment. Planner/Teams is a candidate future task source.
+  - Schedule: the **Aikataulu** plugin's `ICS_BUNDLE` (section `78357980`, all 9 feeds / 162 events)
+    is **embedded** into `index.html` as `SCHED_ICS_EMBED` (snapshot from the saved `Ilves26.html`
+    app copy) — no network fetch / CORS. Shows **Havus → Vaeltaja/Aikuinen** =
+    `vaeltaja-aikuinen.ics` + `yleiset.ics` (69 events; tiny UTC-ICS parser, no RRULE).
+    Configurable via `SCHED_AGE`/`SCHED_CAMP`; re-embed the bundle to refresh.
+- **Tickets → Microsoft Planner** (replaced the SharePoint ticket-server). The server reads the
+  *Operaatiokeskus tehtävät* plan (`w2Y2pqVlOkKDXrV2TiaYxJYAF5oR`) via **MS Graph**
+  `/planner/plans/{id}/buckets`+`/tasks`, authenticated with the **Graph token from the logged-in
+  session's MSAL cache** (`getGraphToken`), grouped by column (`groupByBucket`/`mapTask`).
+  **Uudet tiketit** ← *Uudet tehtävät*, **Käsittelyssä** ← *Työn alla*. Board page recoloured to
+  Planner columns. Needs the user's live Microsoft login to verify; diag at `/api/health`.
+- **Removed the Osallistujaviestintä panel** (and its `/api/form` + xlsx code) and the caption
+  **Havus · Vaeltaja / Aikuinen** was added to the schedule card.
 
 ## Status: working
 
@@ -45,11 +53,10 @@ Hosted at <https://github.com/samvaol/operaatiokeskus>.
   FMI radar WMS (`Radar:suomi_dbz_eureffin`, CORS `*`) over a CARTO light base, refreshed
   every 5 min. Non-interactive. `.radarwrap` needs `isolation:isolate` so Leaflet's internal
   z-indexes (200–700) don't paint over the ticket modal.
-- **Uudet tiketit** — Uusi tickets always on screen (col 1), 60 s refresh from ticket-server.
-- **Käynnissä olevat operaatiot** — the "Käsittelyssä operaatiokeskuksessa" bucket (col 3, under
-  Ohjelma), 60 s refresh (reuses the same `/api/tickets` fetch as the Uusi panel).
-- **Osallistujaviestintä** — 3 latest form responses (col 4, under Pääuutiset), live 60 s refresh
-  from `/api/form`. The `ticket-server` downloads + parses the SharePoint Excel workbook.
+- **Uudet tiketit** — the *Uudet tehtävät* Planner column, always on screen (col 1), 60 s refresh.
+- **Käsittelyssä** — the *Työn alla* Planner column (col 3, under Ohjelma), 60 s refresh
+  (reuses the same `/api/tickets` fetch as the Uudet-tiketit panel).
+  *(ilves26: was "Käynnissä olevat operaatiot" / SharePoint status buckets.)*
 - **Päivän ohjelma** — today's whole-camp events (nyt/seuraava), embedded snapshot +
   optional live `kaiku2026.fi/api/schedules`.
 - **Työvuorossa nyt** — current 1./2. shift from `Operaatiokeskuksen työvuorolista.xlsx`

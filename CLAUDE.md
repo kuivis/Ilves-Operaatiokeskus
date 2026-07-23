@@ -2,7 +2,7 @@
 
 A single-page **TV dashboard** for the **ilves26** scout-camp operations centre (Hämeen
 Partiopiirin leiri, **Evo 23.–31.7.2026**), plus a small **Node ticket-server** that feeds it
-SharePoint tickets. Everything is Finnish-first and uses the **ilves26** visual identity
+**Microsoft Planner** tickets. Everything is Finnish-first and uses the **ilves26** visual identity
 (Brändiopas v0.2).
 
 > **Fork of `samvaol/operaatiokeskus`** re-skinned to ilves26. Structure, data logic and the
@@ -25,15 +25,19 @@ SharePoint tickets. Everything is Finnish-first and uses the **ilves26** visual 
 - **Data sources (ilves26):**
   - **News** = ilves26 GoodBarber app (`api.ww-api.com/front/get_items/4406427/<section>/`),
     merging **Tiedotteet** `75180339` + **Ilves NYT** `77682659` (sorted newest-first).
-  - **Schedule** = the app's **Aikataulu** plugin (section `78357980`), whose `index.html`
-    embeds an `ICS_BUNDLE` object of per-feed `.ics` strings (Google Calendar exports). We fetch
-    that bundle, pick `${SCHED_AGE}-${SCHED_CAMP}.ics` (or `${SCHED_AGE}.ics` when the age isn't
-    split by subcamp) **+ `yleiset.ics`**, and parse the simple UTC VEVENTs. Config near the top
-    of the schedule code: `SCHED_AGE='vaeltaja-aikuinen'`, `SCHED_CAMP='havus'` — change these to
-    show a different ikäkausi/alaleiri. Feeds have no RRULE/all-day/TZID, so the parser is tiny.
-  - **Still Kaiku (repoint for ilves26):** tickets + Osallistujaviestintä come from the
-    `ticket-server` pointed at Kaiku's SharePoint. Microsoft Planner/Teams is a candidate future
-    task source.
+  - **Schedule** = the app's **Aikataulu** plugin `ICS_BUNDLE` (section `78357980`; all 9 per-feed
+    `.ics` strings, 162 events) **embedded directly** into `index.html` as `SCHED_ICS_EMBED` — no
+    network fetch, no CORS dependency (a snapshot from the saved `Ilves26.html` app copy). At load
+    we pick `${SCHED_AGE}-${SCHED_CAMP}.ics` (or `${SCHED_AGE}.ics` when the age isn't split by
+    subcamp) **+ `yleiset.ics`** and parse the simple UTC VEVENTs (no RRULE/all-day/TZID → tiny
+    parser). Config near the top of the schedule code: `SCHED_AGE='vaeltaja-aikuinen'`,
+    `SCHED_CAMP='havus'` — change to show a different ikäkausi/alaleiri (all feeds are embedded).
+    **To refresh** when the camp updates the schedule, re-embed `ICS_BUNDLE` from the plugin
+    (`…/section/78357980/index.html`) or a fresh app-page save.
+  - **Tickets** = a **Microsoft Planner** board (*Operaatiokeskus tehtävät*, plan
+    `w2Y2pqVlOkKDXrV2TiaYxJYAF5oR`) via the `ticket-server` (see below). **Uudet tiketit** ←
+    *Uudet tehtävät* column, **Käsittelyssä** ← *Työn alla* column. The Osallistujaviestintä
+    panel was removed.
 
 ## ⚠️ Read first
 - The dashboard is **one self-contained `index.html`** — HTML + CSS + vanilla JS, **no
@@ -69,49 +73,36 @@ ticket-server/
 - **Schedule**: embedded whole-camp snapshot + optional live `kaiku2026.fi/api/schedules`
   (usually CORS-blocked → snapshot used).
 - **Työvuorot**: embedded `WORKSHIFTS` object parsed from `Operaatiokeskuksen työvuorolista.xlsx`.
-- **Tiketit**: via the local `ticket-server` (see below), never SharePoint directly.
-- **Osallistujaviestintä**: 3 latest form responses, also via the `ticket-server` (`/api/form`).
-  The server downloads the SharePoint Excel workbook (site `UudenmaanPiirileiri2026`, by
-  sourcedoc GUID) and parses it in-process with a dependency-free zip+OOXML reader.
+- **Tiketit**: from a **Microsoft Planner** board via the local `ticket-server` (see below).
+  (The old SharePoint tickets + Osallistujaviestintä form were removed.)
 - **Konfetti**: `tickTimer` fires `celebrate(pct)` (canvas confetti + toast) on each whole-percent
   advance of the camp progress; `#confetti`/`#celebrateToast` at z 1000/1100.
 
 Every source has an **embedded fallback** so the dashboard never goes blank.
 
-## Ticket server
-- SharePoint **can't be read from the browser**: REST sends `Access-Control-Allow-Origin: *`
-  but no `Access-Control-Allow-Credentials` (cookie blocked cross-origin), and list pages set
-  `X-Frame-Options` (no iframe). So the Node server logs in via a real Playwright browser
-  window and reads REST **from inside** the authenticated page (same-origin).
-- List referenced **by URL** `/sites/Tiketin/Lists/OpkeOspa` via `_api/web/getList(@l)?@l='…'`
-  (not the GUID — an authed call to a wrong GUID 404s). Status field = **`Status`** (choice;
-  7 values Uusi…Ei käsitellä). Fetches **all** items, groups by status.
-- Extraction uses **`context.request.get`** (shares the logged-in context cookies; immune to
-  which tab is open), with a server-owned background page (`requestJsonViaPage`) as fallback.
-  Do **not** poll via `page.evaluate` on a user-visible tab — it breaks on SPA nav / tab switch.
-- Serves `GET /api/tickets` (CORS `*`) → `{status:'ok'|'awaiting-login'|'starting', buckets:[…],
-  uusi:[…], count}`. Dashboard's Uusi panel reads `j.uusi`; the "Käynnissä olevat operaatiot"
-  panel reuses the same fetch and pulls the `Käsittelyssä operaatiokeskuksessa` bucket; the popup
-  reads `j.buckets`. Override host with `?ticketApi=`.
-- Also serves `GET /api/form` → `{status, entries:[{id,when,who,subject,message,extras}]}` — the
-  **3 latest** rows of the *Osallistujaviestintä* Excel workbook (site `UudenmaanPiirileiri2026`,
-  `GetFileById('<sourcedoc-GUID>')/$value`). The `.xlsx` is parsed **in-process, no deps** by
-  `unzip` (central-directory + `zlib.inflateRawSync`) → `parseSheet`/`parseSharedStrings`/
-  `parseStyles`/`extractForm`. Date columns are detected from `styles.xml` (numFmt) and Excel
-  serials converted with UTC getters; columns map to roles by header (`roleOf`). Refreshed every
-  60 s (live). Dashboard reads it at `/api/form` (override with `?formApi=`, else derived from
-  `?ticketApi=`).
-- **Cross-site-collection auth (was the "form never updates" bug, fixed c2b63d8):** SharePoint
-  Online's `FedAuth` cookie is **per site collection**, so logging into `/sites/Tiketin` does NOT
-  authorize the workbook on `/sites/UudenmaanPiirileiri2026`. `ensureFormPage` warms it by
-  navigating a real page to `FORM_SITE` (browser completes the rtFa→FedAuth SSO handshake and the
-  cookie lands in the context). And because an **unauthenticated SharePoint request returns the
-  sign-in HTML with HTTP 200**, the binary download rejects `text/html` and verifies the zip magic
-  `PK\x03\x04` (`buf.readUInt32BE(0)===0x504b0304`) — otherwise a login page unzips to nothing and
-  the panel silently shows "Ei viestejä" as `status:'ok'`. Diagnose via `/api/form` (`status`,
-  `error`) + the server console `[form]` lines.
-- Startup is guarded by `if (require.main === module) start()`; `module.exports` exposes the xlsx
-  helpers so they can be unit-tested (`node -e "require('./server.js')…"`) without Playwright.
+## Ticket server (Microsoft Planner)
+- The board (*Operaatiokeskus tehtävät*, `PLAN_ID=w2Y2pqVlOkKDXrV2TiaYxJYAF5oR`) is read via
+  **Microsoft Graph** `/planner/plans/{planId}/buckets` + `/tasks`. On start the Node server opens
+  the **Planner board in a visible Playwright window** (`plannerPage`) — you log in once with your
+  Microsoft account (session persists in `.auth`).
+- **Auth = a Graph bearer token, not cookies** (Graph needs a token). `getGraphToken(page)` reads
+  the page's **MSAL cache** (local/sessionStorage) for an `AccessToken` credential whose scope
+  looks Planner-capable (`group.*` / `tasks.*` / `.default`) and returns its `secret`; Graph is
+  then called with `context.request.get` + `Authorization: Bearer` (Node-side, no CORS). If the
+  token is near expiry or a call 401s, it reloads `plannerPage` so MSAL refreshes silently.
+- `groupByBucket` maps `bucketId → name` and orders columns by `BUCKET_ORDER` (`Uudet tehtävät`,
+  `Työn alla`, `Valmis`, …); `mapTask` → the ticket shape (`id` = last 4 of the task id;
+  `safety` = Planner priority 1–3; tasks sorted by `orderHint`).
+- Serves `GET /api/tickets` (CORS `*`) → `{status:'ok'|'awaiting-login'|'error', buckets:[…],
+  uusi:[…], count, diag}`. **`uusi` = the `Uudet tehtävät` bucket.** Dashboard's Uudet-tiketit
+  panel reads `j.uusi`; the **Käsittelyssä** panel (`opsFrom`) pulls the **`Työn alla`** bucket;
+  the popup reads `j.buckets`. Override host with `?ticketApi=`, plan with env `PLAN_ID`.
+- **Diagnose** via `GET /api/health` / the `diag` field + the server console `[planner]` lines:
+  `awaiting-login` (+ "ei Graph-tokenia") = not logged in / no Graph-scoped token yet;
+  `buckets HTTP 403` = the session's Graph token lacks Planner scope (needs Group/Tasks read —
+  may require consent or an app registration); `HTTP 404` = wrong `PLAN_ID`.
+- Startup is guarded by `if (require.main === module) start()`; `module.exports` exposes
+  `mapTask`/`groupByBucket`/`getGraphToken` for unit tests (no Playwright needed).
 - Run: `cd ticket-server && npm install && npm start`. `HEADLESS=1` runs headless (only works
   once `.auth` is warm). Session persists in `ticket-server/.auth` (git-ignored, secret).
 
