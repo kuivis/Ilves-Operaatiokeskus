@@ -85,13 +85,19 @@ Every source has an **embedded fallback** so the dashboard never goes blank.
   **Microsoft Graph** `/planner/plans/{planId}/buckets` + `/tasks`. On start the Node server opens
   the **Planner board in a visible Playwright window** (`plannerPage`) — you log in once with your
   Microsoft account (session persists in `.auth`).
-- **Auth = a Graph bearer token, not cookies** (Graph needs a token). `getGraphToken(page)` reads
-  the page's **MSAL cache** (local/sessionStorage) for an `AccessToken` credential whose scope
-  looks Planner-capable (`group.*` / `tasks.*` / `.default`) and returns its `secret`; Graph is
-  then called with `context.request.get` + `Authorization: Bearer` (Node-side, no CORS). Each 60 s
-  poll **reloads `plannerPage`** first (then a ~2.5 s settle) so the session stays alive and MSAL
-  keeps the token fresh — like the Planner board refreshing itself (first poll skips the reload
-  since `goto` just loaded it).
+- **Auth = a Graph bearer token, not cookies** (Graph needs a token). `planner.cloud.microsoft`
+  does **not** cache a readable Graph token (an MSAL-storage read returned nothing — confirmed on
+  the user's machine, `diag: "ei Graph-tokenia MSAL-välimuistissa"`). So instead a **network
+  sniffer** (`attachSniffer`) captures the app's own `Authorization: Bearer` tokens from its
+  requests, decodes each JWT's `aud`/`scp` (`decodeJwt`), and `pickGraphToken` picks one whose
+  `aud=graph.microsoft.com` and scope is Planner-capable (`group`/`tasks`/`planner`/`.default`).
+  Graph is then called Node-side with `context.request.get` (no CORS). Fallback: it also captures
+  the app's own **task/bucket response bodies** (`useCapturedGraphResponses`) in case they're
+  Graph-shaped. Each 60 s poll **reloads `plannerPage`** (then ~3.5 s settle) so the app re-fetches
+  and the sniffer sees fresh tokens/data. **`GET /api/debug`** dumps the captured token audiences +
+  scopes, seen data URLs, and captured response shapes — the tool for diagnosing whether the app
+  even issues a Planner-scoped Graph token (if it only uses the **taskmars** backend, we'd pivot to
+  that or to an Azure app registration).
 - `groupByBucket` maps `bucketId → name` and orders columns by `BUCKET_ORDER` (`Uudet tehtävät`,
   `Työn alla`, `Valmis`, …); `mapTask` → the ticket shape (`id` = last 4 of the task id;
   `safety` = Planner priority 1–3; tasks sorted by `orderHint`).

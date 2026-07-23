@@ -37,28 +37,62 @@ let context = null;
 let plannerPage = null;
 let firstPoll = true;
 
-// --- Graph-token kirjautuneen istunnon MSAL-välimuistista ---
-// Etsitään AccessToken-credential, jonka scope viittaa Planner-lukuun
-// (group.*, tasks.*, .default). Palautetaan { token, exp, target }.
-async function getGraphToken(page) {
-  return page.evaluate(() => {
-    const wanted = /(^|[ .])(group|tasks|planner)\.|\.default/i; // Planner-luku vaatii Group/Tasks-scopet
-    let best = null;
-    for (const store of [window.localStorage, window.sessionStorage]) {
-      for (let i = 0; i < store.length; i++) {
-        const k = store.key(i); const v = store.getItem(k);
-        if (!v || v[0] !== '{') continue;
-        let o; try { o = JSON.parse(v); } catch (e) { continue; }
-        if (!o || !/AccessToken/i.test(o.credentialType || '') || !o.secret) continue;
-        const target = String(o.target || '');
-        // Vain Graph-tokenit (Planner-scopet). Ohita mars/muut resurssit.
-        if (!wanted.test(target)) continue;
-        const exp = Number(o.expiresOn || o.extendedExpiresOn || 0);
-        if (!best || exp > best.exp) best = { token: o.secret, exp, target };
+// --- Verkkoliikenteen nuuskinta ---
+// planner.cloud.microsoft ei tallenna Graph-tokenia luettavaan välimuistiin, joten
+// napataan sovelluksen OMAT tokenit ja data-vastaukset sen verkkopyynnöistä. Sivu
+// ladataan joka 60 s uudelleen, joten sovellus hakee datan aina uudelleen.
+const sniff = { tokens: {}, responses: {}, seenUrls: [] };
+function decodeJwt(t) {
+  try { return JSON.parse(Buffer.from(String(t).split('.')[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8')); }
+  catch (e) { return null; }
+}
+function attachSniffer(page) {
+  page.on('request', (req) => {
+    try {
+      const url = req.url();
+      if (!/graph\.microsoft\.com|taskmars|planner\.cloud|office\.com/i.test(url)) return;
+      const auth = req.headers()['authorization'];
+      if (auth && /^bearer /i.test(auth)) {
+        const tok = auth.slice(7);
+        const p = decodeJwt(tok) || {};
+        const aud = String(p.aud || '?').replace(/^https?:\/\//, '').replace(/\/$/, '');
+        sniff.tokens[aud] = { token: tok, scp: String(p.scp || (p.roles || []).join(' ') || ''), exp: Number(p.exp || 0), seenAt: Date.now() };
       }
-    }
-    return best;
+    } catch (e) { /* ohita */ }
   });
+  page.on('response', async (resp) => {
+    try {
+      const url = resp.url();
+      if (!/graph\.microsoft\.com|taskmars/i.test(url)) return;
+      const ct = String(resp.headers()['content-type'] || '');
+      if (!/json/i.test(ct)) return;
+      const bare = url.split('?')[0];
+      if (sniff.seenUrls.length < 60 && !sniff.seenUrls.includes(bare)) sniff.seenUrls.push(bare);
+      const kind = /bucket/i.test(url) ? 'buckets' : (/task/i.test(url) ? 'tasks' : null);
+      if (kind) { const body = await resp.json().catch(() => null); if (body) sniff.responses[kind] = { url: bare, body }; }
+    } catch (e) { /* ohita */ }
+  });
+}
+// Palauta Graph-token, jolla on Planner-lukuoikeus (aud=graph, scope group/tasks/planner/.default)
+function pickGraphToken() {
+  let best = null;
+  for (const [aud, info] of Object.entries(sniff.tokens)) {
+    if (!/graph\.microsoft\.com/i.test(aud)) continue;
+    if (!/group|tasks|planner|\.default/i.test(info.scp)) continue;
+    if (info.exp * 1000 < Date.now() + 10000) continue; // ei vanhentunutta
+    if (!best || info.exp > best.exp) best = info;
+  }
+  return best;
+}
+// Graph-muotoinen ({value:[…]}) tehtävä/bucket-vastaus napattuna → tila
+function useCapturedGraphResponses() {
+  const t = sniff.responses.tasks, b = sniff.responses.buckets;
+  const tasks = t && Array.isArray(t.body.value) ? t.body.value : null;
+  const buckets = b && Array.isArray(b.body.value) ? b.body.value : null;
+  if (!tasks || !tasks[0] || !('bucketId' in tasks[0])) return false; // ei Graph-muotoa
+  const bucketMap = {}; for (const x of (buckets || [])) bucketMap[x.id] = x.name;
+  applyTasks(tasks, bucketMap, 'napattu Graph-vastaus');
+  return true;
 }
 
 async function graphGet(token, urlPath) {
@@ -104,43 +138,45 @@ function groupByBucket(tasks, bucketMap) {
   });
 }
 
+function applyTasks(tasks, bucketMap, source) {
+  state.buckets = groupByBucket(tasks, bucketMap);
+  state.uusi = (state.buckets.find((b) => b.name === NEW_BUCKET) || { tickets: [] }).tickets;
+  state.count = tasks.length;
+  state.status = 'ok'; state.updatedAt = new Date().toISOString(); state.error = null;
+  state.diag = `ok (${source}) — ${tasks.length} tehtävää, sarakkeet: ${Object.values(bucketMap).join(', ') || '—'}`;
+  console.log(`[planner] ${new Date().toLocaleTimeString('fi-FI')} — ${tasks.length} tehtävää (Uudet: ${state.uusi.length}) [${source}]`);
+}
+
 async function poll() {
   if (!context || !plannerPage) return;
   try {
-    // Päivitä Planner-sivu joka kierros (60 s) — pitää istunnon elossa ja MSAL-tokenin
-    // tuoreena (aivan kuten Planner-taulu itsekin päivittyy). Ensimmäisellä kerralla
-    // sivu on juuri ladattu (goto), joten reload ohitetaan.
+    // Päivitä Planner-sivu joka kierros (60 s), jotta sovellus hakee datan uudelleen ja
+    // token pysyy tuoreena. Ensimmäisellä kerralla sivu on juuri ladattu (goto).
     if (!firstPoll) await plannerPage.reload({ waitUntil: 'domcontentloaded', timeout: 60000 }).catch(() => {});
     firstPoll = false;
-    await plannerPage.waitForTimeout(2500).catch(() => {}); // anna MSAL/appin asettua
-    // 1) Graph-token kirjautuneesta istunnosta
-    const tok = await getGraphToken(plannerPage).catch(() => null);
-    if (!tok || !tok.token) {
-      state.status = 'awaiting-login'; state.error = null; state.diag = 'ei Graph-tokenia MSAL-välimuistissa';
-      console.log('[planner] ei Graph-tokenia — kirjaudu avautuneessa Planner-ikkunassa'); return;
+    await plannerPage.waitForTimeout(3500).catch(() => {}); // anna sovelluksen hakea data (napataan pyynnöt)
+
+    // 1) Graph-token napattuna sovelluksen omista pyynnöistä → Graph /planner
+    const gt = pickGraphToken();
+    if (gt) {
+      const bk = await graphGet(gt.token, `/planner/plans/${PLAN_ID}/buckets`);
+      const tk = bk.ok ? await graphGet(gt.token, `/planner/plans/${PLAN_ID}/tasks`) : null;
+      if (bk.ok && tk && tk.ok) {
+        const bucketMap = {}; for (const b of (bk.json.value || [])) bucketMap[b.id] = b.name;
+        applyTasks(tk.json.value || [], bucketMap, 'Graph');
+        return;
+      }
+      state.diag = `Graph buckets=${bk.status}${tk ? ' tasks=' + tk.status : ''} (scope: ${gt.scp.slice(0, 50)})`;
+      console.log('[planner] ' + state.diag);
     }
-    // 2) sarakkeet
-    const bk = await graphGet(tok.token, `/planner/plans/${PLAN_ID}/buckets`);
-    if (!bk.ok) {
-      state.diag = `buckets HTTP ${bk.status} (scope: ${tok.target.slice(0, 60)})`;
-      if (bk.status === 401) { state.status = 'awaiting-login'; state.error = null; } // seuraava kierros lataa sivun ja uusii tokenin
-      else { state.status = 'error'; state.error = `Graph buckets ${bk.status} — tarkista oikeudet/PLAN_ID`; }
-      console.log(`[planner] buckets HTTP ${bk.status} — ${state.diag}`); return;
-    }
-    const bucketMap = {}; for (const b of (bk.json.value || [])) bucketMap[b.id] = b.name;
-    // 3) tehtävät
-    const tk = await graphGet(tok.token, `/planner/plans/${PLAN_ID}/tasks`);
-    if (!tk.ok) {
-      state.diag = `tasks HTTP ${tk.status}`; state.status = 'error'; state.error = `Graph tasks ${tk.status}`;
-      console.log(`[planner] tasks HTTP ${tk.status}`); return;
-    }
-    const tasks = tk.json.value || [];
-    state.buckets = groupByBucket(tasks, bucketMap);
-    state.uusi = (state.buckets.find((b) => b.name === NEW_BUCKET) || { tickets: [] }).tickets;
-    state.count = tasks.length;
-    state.status = 'ok'; state.updatedAt = new Date().toISOString(); state.error = null;
-    state.diag = `ok — ${tasks.length} tehtävää, sarakkeet: ${Object.values(bucketMap).join(', ')}`;
-    console.log(`[planner] ${new Date().toLocaleTimeString('fi-FI')} — ${tasks.length} tehtävää (Uudet: ${state.uusi.length})`);
+    // 2) fallback: sovelluksen omat napatut data-vastaukset (jos Graph-muotoisia)
+    if (useCapturedGraphResponses()) return;
+
+    // 3) ei (vielä) dataa — kerro mitä nähtiin (auttaa diagnosoinnissa)
+    const auds = Object.keys(sniff.tokens).join(', ') || 'ei tokeneita';
+    state.status = 'awaiting-login'; state.error = null;
+    state.diag = `ei Planner-dataa vielä — token-aud: [${auds}]; data-URLeja nähty: ${sniff.seenUrls.length}. Kirjaudu Planner-ikkunassa ja odota; ks. /api/debug`;
+    console.log('[planner] ' + state.diag);
   } catch (e) {
     state.status = 'error'; state.error = String((e && e.message) || e);
     console.log('[planner] virhe:', state.error);
@@ -162,6 +198,24 @@ app.get('/api/tickets', (_req, res) => res.json({
 app.get('/api/health', (_req, res) => res.json({
   status: state.status, updatedAt: state.updatedAt, count: state.count, uusi: state.uusi.length, diag: state.diag, planId: PLAN_ID
 }));
+// Diagnostiikka: mitä tokeneita/dataa sovelluksen liikenteestä on napattu
+app.get('/api/debug', (_req, res) => {
+  const summarize = (b) => {
+    if (!b) return null;
+    if (Array.isArray(b.value)) return { valueLen: b.value.length, firstKeys: b.value[0] ? Object.keys(b.value[0]).slice(0, 20) : [] };
+    return { topKeys: Object.keys(b).slice(0, 20) };
+  };
+  res.json({
+    status: state.status, planId: PLAN_ID, diag: state.diag,
+    tokens: Object.fromEntries(Object.entries(sniff.tokens).map(([aud, i]) =>
+      [aud, { scp: i.scp.slice(0, 220), expiresInSec: Math.round(i.exp - Date.now() / 1000) }])),
+    seenUrls: sniff.seenUrls,
+    captured: {
+      tasks: sniff.responses.tasks ? { url: sniff.responses.tasks.url, shape: summarize(sniff.responses.tasks.body) } : null,
+      buckets: sniff.responses.buckets ? { url: sniff.responses.buckets.url, shape: summarize(sniff.responses.buckets.body) } : null
+    }
+  });
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 const start = async () => {
@@ -172,6 +226,7 @@ const start = async () => {
     args: ['--no-first-run']
   });
   plannerPage = context.pages()[0] || await context.newPage();
+  attachSniffer(plannerPage); // nappaa sovelluksen tokenit + data-vastaukset
   await plannerPage.goto(PLANNER_URL, { waitUntil: 'domcontentloaded', timeout: 60000 }).catch(() => {});
   if (!HEADLESS) { try { await plannerPage.bringToFront(); } catch (_) {} }
   context.on('close', () => { console.log('Selain suljettiin — käynnistä palvelin uudelleen (npm start).'); process.exit(0); });
@@ -179,7 +234,7 @@ const start = async () => {
   app.listen(PORT, () => {
     console.log(`\n  Tehtävä-palvelin:  http://localhost:${PORT}`);
     console.log(`  JSON-rajapinta:    http://localhost:${PORT}/api/tickets`);
-    console.log(`  Diagnostiikka:     http://localhost:${PORT}/api/health`);
+    console.log(`  Diagnostiikka:     http://localhost:${PORT}/api/health  ·  /api/debug`);
     console.log(`  → Kirjaudu avautuneessa Planner-ikkunassa Microsoft-tunnuksilla.\n`);
   });
 
@@ -193,4 +248,4 @@ const start = async () => {
 
 // Käynnistä vain suorana ajona; require() (testit) saa apufunktiot ilman selainta.
 if (require.main === module) start().catch((e) => { console.error('Palvelin ei käynnistynyt:', e); process.exit(1); });
-module.exports = { mapTask, groupByBucket, getGraphToken };
+module.exports = { mapTask, groupByBucket, decodeJwt, pickGraphToken };
