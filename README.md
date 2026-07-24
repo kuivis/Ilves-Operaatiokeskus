@@ -28,7 +28,7 @@ A single-page TV dashboard for the **ilves26** scout camp operations centre
   (Ilmatieteen laitos), including the forest-fire warning (*metsäpalovaroitus*).
 - **Sadetutka · Evo** — live FMI weather radar (Leaflet map) centred on Evo, refreshed every 5 min.
 - **Päivän ohjelma** — today's whole-camp programme with *nyt* / *seuraava* markers.
-- **Työvuorossa nyt** — who is on shift right now (from the työvuorolista).
+- **Työvuorossa tänään** — daily shift schedule (aamu, päivä, ilta, yö) with real-time active shift highlighting (`NYT`).
 - **Uudet tiketit** — the **Uudet tehtävät** Planner column, always on screen, refreshed every 60 s.
 - **Käsittelyssä** — the **Työn alla** Planner column, refreshed every 60 s.
 - **Uutiset** — the latest articles from the ilves26 app (Tiedotteet + Ilves NYT).
@@ -42,6 +42,7 @@ A single-page TV dashboard for the **ilves26** scout camp operations centre
 | Sadetutka (radar) | FMI radar WMS (`Radar:suomi_dbz_eureffin`) + Leaflet/CARTO base |
 | Uutiset | ilves26 app content API (Corego / GoodBarber) — Tiedotteet + Ilves NYT |
 | Päivän ohjelma | ilves26 app *Aikataulu* `ICS_BUNDLE` (embedded) — Havus → Vaeltaja/Aikuinen |
+| Työvuorot | `DUTY_SHIFTS` dataset embedded in `index.html` (23.–31.7.2026 shifts) |
 | Tehtävät (Uudet tiketit / Käsittelyssä) | **Microsoft Planner** board, via the local `ticket-server` |
 
 ## Tickets — the `ticket-server` (Microsoft Planner)

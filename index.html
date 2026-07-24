@@ -246,6 +246,29 @@ main{
 .art .by{font-size:.78rem; color:#a49f92; margin-top:auto; font-weight:600}
 .art + .art{border-top:1px solid #efe6d3; padding-top:.85rem}
 
+/* ===== Työvuorossa tänään ===== */
+.card.shiftcard-widget{--accent:var(--metsa)}
+.shift-grid{display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-top:.2rem}
+.shift-box{
+  background:#f9f6f0; border:1px solid var(--line); border-radius:.6rem;
+  padding:.45rem .6rem; display:flex; flex-direction:column; gap:.1rem; position:relative;
+  transition:all .2s ease;
+}
+.shift-box.now{
+  background:#fff8ee; border:1px solid var(--kulta); border-left:.32rem solid var(--punainen);
+  box-shadow:0 2px 8px rgba(206,87,56,.12);
+}
+.shift-box .s-hdr{display:flex; align-items:center; justify-content:space-between; gap:.3rem}
+.shift-box .s-title{font-size:.74rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2)}
+.shift-box.now .s-title{color:var(--punainen)}
+.shift-box .s-time{font-size:.7rem; font-weight:600; color:var(--ink-3)}
+.shift-box .s-name{font-size:1rem; font-weight:800; color:var(--ink); line-height:1.15; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.shift-box.now .s-name{color:var(--ink); font-size:1.08rem}
+.shift-box .s-badge{
+  font-size:.62rem; font-weight:900; background:var(--punainen); color:#fff;
+  padding:.1rem .4rem; border-radius:999px; letter-spacing:.04em;
+}
+
 
 /* Metatiedon pienet ikonit (korvaavat emojit tiketti-/viesti-riveillä) */
 .mi{width:.92rem; height:.92rem; fill:none; stroke:currentColor; stroke-width:1.85;
@@ -371,6 +394,10 @@ main{
         </div>
       </div>
 
+      <div class="card shiftcard-widget" style="flex:0 0 auto">
+        <div class="card-h"><span class="ic"><svg aria-hidden="true"><use href="#i-user"/></svg></span><h2>Työvuorossa tänään</h2><span class="sub" id="shiftDaySub">–</span></div>
+        <div class="shift-grid" id="shiftGrid"><div class="muted">Ladataan vuoroja…</div></div>
+      </div>
 
       <div class="card tickets" style="flex:1 1 auto">
         <div class="card-h"><span class="ic"><svg aria-hidden="true"><use href="#i-ticket"/></svg></span><h2>Uudet tiketit</h2><span class="sub" id="uusiStatus">–</span></div>
@@ -1035,11 +1062,66 @@ function renderBuckets(buckets){
   }).join('');
 }
 
+/* ============ TYÖVUOROSSA TÄNÄÄN ============ */
+const DUTY_SHIFTS = {
+  '2026-07-23': { aamu: 'Laura', paiva: 'Sanna', ilta: 'Eemeli', yo: 'Sanni', label: 'To 23.7.' },
+  '2026-07-24': { aamu: 'Sanna', paiva: 'Sanni', ilta: 'Eemeli', yo: 'Siekkinen', label: 'Pe 24.7.' },
+  '2026-07-25': { aamu: 'Sanni', paiva: 'Siekkinen', ilta: 'Laura', yo: 'Sanna', label: 'La 25.7.' },
+  '2026-07-26': { aamu: 'Kengu', paiva: 'Sanna', ilta: 'Siekkinen', yo: 'Sami', label: 'Su 26.7.' },
+  '2026-07-27': { aamu: 'Siekkinen', paiva: 'Sanna', ilta: 'Sanni', yo: 'Sami', label: 'Ma 27.7.' },
+  '2026-07-28': { aamu: 'Laura', paiva: 'Kengu', ilta: 'Sami', yo: 'Sanni', label: 'Ti 28.7.' },
+  '2026-07-29': { aamu: 'Sanna', paiva: 'Sanni', ilta: 'Sami', yo: 'Eemeli', label: 'Ke 29.7.' },
+  '2026-07-30': { aamu: 'Sanni', paiva: 'Laura', ilta: 'Sanna', yo: 'Helmi', label: 'To 30.7.' },
+  '2026-07-31': { aamu: 'Kengu', paiva: 'Sami', ilta: '–', yo: '–', label: 'Pe 31.7.' }
+};
+
+const SHIFT_TIMES = [
+  { key: 'aamu', title: 'Aamu', time: '8–12:50' },
+  { key: 'paiva', title: 'Päivä', time: '12:40–16:50' },
+  { key: 'ilta', title: 'Ilta', time: '16:40–20:50' },
+  { key: 'yo', title: 'Yö', time: '20:40–00' }
+];
+
+function renderDutyShifts(){
+  const p = helParts(Date.now());
+  const todayKey = p.date;
+  const activeKey = DUTY_SHIFTS[todayKey] ? todayKey : '2026-07-24';
+  const dayData = DUTY_SHIFTS[activeKey];
+
+  const subEl = document.getElementById('shiftDaySub');
+  if (subEl) subEl.textContent = dayData.label;
+
+  const mins = p.h * 60 + p.m;
+  const grid = document.getElementById('shiftGrid');
+  if (!grid) return;
+
+  grid.innerHTML = SHIFT_TIMES.map(st => {
+    let isNow = false;
+    if (st.key === 'aamu' && mins >= 480 && mins < 760) isNow = true;
+    else if (st.key === 'paiva' && mins >= 760 && mins < 1000) isNow = true;
+    else if (st.key === 'ilta' && mins >= 1000 && mins < 1240) isNow = true;
+    else if (st.key === 'yo' && (mins >= 1240 || mins < 480)) isNow = true;
+
+    const person = dayData[st.key] || '–';
+
+    return `
+      <div class="shift-box${isNow ? ' now' : ''}">
+        <div class="s-hdr">
+          <span class="s-title">${st.title}</span>
+          ${isNow ? '<span class="s-badge">NYT</span>' : `<span class="s-time">${st.time}</span>`}
+        </div>
+        <div class="s-name">${esc(person)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
 /* ============ KÄYNNISTYS ============ */
-tickClock(); tickTimer(); renderSchedule();
+tickClock(); tickTimer(); renderSchedule(); renderDutyShifts();
 setInterval(tickClock, 1000);
 setInterval(tickTimer, 1000);
 setInterval(renderSchedule, 30000);       // päivitä nyt/seuraava-merkinnät
+setInterval(renderDutyShifts, 30000);     // päivitä vuorossa tänään
 loadWeather();      setInterval(loadWeather, 10*60*1000);   // 10 min
 loadNews();         setInterval(loadNews, 5*60*1000);       // 5 min
 loadUusi();         setInterval(loadUusi, 60000);           // 60 s — uudet tehtävät + käsittelyssä (Planner)

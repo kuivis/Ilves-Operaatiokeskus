@@ -13,6 +13,7 @@
  * Käyttö:  npm install  &&  npm start
  * Ympäristö:  PORT=8137   PLAN_ID=<plan>   HEADLESS=1 (vaatii valmiin .auth-istunnon)
  */
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const { chromium } = require('playwright');
@@ -20,6 +21,11 @@ const { chromium } = require('playwright');
 const PORT = Number(process.env.PORT || 8137);
 const HEADLESS = process.env.HEADLESS === '1';
 const USER_DATA_DIR = path.join(__dirname, '.auth');
+// Kirjautumisen istuntoevästeet (mm. Microsoftin ESTSAUTH) elävät vain muistissa
+// eivätkä tallennu persistent-profiiliin. Kirjoitetaan koko storage-tila tänne
+// jokaisen onnistuneen luvun jälkeen ja palautetaan käynnistyksessä, jottei
+// kirjautumista tarvitse tehdä uudelleen joka npm start -kerralla.
+const STATE_FILE = path.join(USER_DATA_DIR, 'storage-state.json');
 
 // --- Planner-taulu (Operaatiokeskus tehtävät) ---
 const PLAN_ID = process.env.PLAN_ID || 'w2Y2pqVlOkKDXrV2TiaYxJYAF5oR';
@@ -60,39 +66,45 @@ function buildBuckets(columns) {
 }
 
 // --- Taulun luku renderöidystä sivusta ---
-// Sarakkeet tunnistetaan "lisää tehtäväkortti sarakkeeseen X" -painikkeista, ja kunkin
-// sarakkeen kortit sen sisältä (" Tehtävä {otsikko} "). Toimii FI + EN.
+// Sarakkeet tunnistetaan niiden otsikko-aria-labelista ("Column {nimi}, …" / "Sarake {nimi}, …")
+// ja kunkin sarakkeen kortit sen sisältä ("Task {otsikko}" / "Tehtävä {otsikko}"). Toimii FI + EN.
+// (Aiemmin luettiin "lisää tehtäväkortti" -painikkeista, mutta Planner muutti niiden labelin
+//  muotoon "Add task card in {nimi} column" — sarakeotsikko on vakaampi ankkuri.)
 async function scrapeBoard(page) {
   return page.evaluate(() => {
     const norm = (s) => (s || '').replace(/\s+/g, ' ').trim();
     const all = [...document.querySelectorAll('[aria-label]')];
-    const addRe = /(?:sarakkeeseen|to bucket|to column|kohteeseen)\s+(.+?)\s*$/i;      // "…sarakkeeseen Uudet tehtävät"
+    // Sarakeotsikko: "Column Uudet tehtävät, Use Ctrl+…" (EN) / "Sarake Uudet tehtävät, …" (FI).
+    const colRe = /^(?:column|sarake)\s+(.+?)\s*(?:,|$)/i;
+    // Lisää-kortti-painike (vain diagnostiikkaan / renderöitymisen odotukseen). Useita muotoja:
+    //  "Add task card in {nimi} column", "Add task to bucket {nimi}", "Lisää tehtäväkortti sarakkeeseen {nimi}".
     const addPrefix = /(lisää tehtäväkortti|add task|add card|new task)/i;
-    const taskRe = /^(?:tehtävä|task)\s+(.+)$/i;                                        // " Tehtävä Otsikko "
+    const taskRe = /^(?:tehtävä|task)\s+(.+)$/i;                                        // "Task {otsikko}"
 
     const addButtons = all
       .map((e) => norm(e.getAttribute('aria-label')))
-      .filter((l) => addPrefix.test(l) && addRe.test(l));
+      .filter((l) => addPrefix.test(l));
 
-    // Löydä kunkin sarakkeen kontti (suurin esi-isä, jossa on täsmälleen tämä yksi add-painike)
+    // Kullekin sarakeotsikolle: etsi kontti = suurin esi-isä, jossa on täsmälleen tämä yksi
+    // sarakeotsikko, ja kerää sen sisältä tehtäväkortit.
+    const isCol = (e) => colRe.test(norm(e.getAttribute('aria-label')));
     const columns = [];
-    for (const btn of all) {
-      const lbl = norm(btn.getAttribute('aria-label'));
-      if (!addPrefix.test(lbl) || !addRe.test(lbl)) continue;
-      const name = norm(addRe.exec(lbl)[1]);
-      let best = btn.parentElement, node = btn.parentElement;
+    for (const h of all) {
+      if (!isCol(h)) continue;
+      const name = norm(colRe.exec(norm(h.getAttribute('aria-label')))[1]);
+      if (!name || columns.some((c) => c.name === name)) continue;
+      let best = h.parentElement, node = h.parentElement;
       while (node && node !== document.body) {
-        const adds = [...node.querySelectorAll('[aria-label]')]
-          .filter((e) => { const a = norm(e.getAttribute('aria-label')); return addPrefix.test(a) && addRe.test(a); }).length;
-        if (adds === 1) best = node; else if (adds > 1) break;
+        const heads = [...node.querySelectorAll('[aria-label]')].filter(isCol).length;
+        if (heads === 1) best = node; else if (heads > 1) break;
         node = node.parentElement;
       }
       const titles = [];
-      for (const e of (best || btn.parentElement).querySelectorAll('[aria-label]')) {
+      for (const e of (best || h.parentElement).querySelectorAll('[aria-label]')) {
         const m = taskRe.exec(norm(e.getAttribute('aria-label')));
         if (m) { const t = norm(m[1]); if (t && !titles.includes(t)) titles.push(t); }
       }
-      if (!columns.some((c) => c.name === name)) columns.push({ name, titles });
+      columns.push({ name, titles });
     }
     const taskCards = all.filter((e) => taskRe.test(norm(e.getAttribute('aria-label')))).length;
     const sampleLabels = [...new Set(all.map((e) => norm(e.getAttribute('aria-label'))).filter(Boolean))].slice(0, 40);
@@ -106,10 +118,10 @@ async function poll() {
     // Päivitä sivu joka kierros (60 s), jotta taulu näyttää tuoreen tilan.
     if (!firstPoll) await plannerPage.reload({ waitUntil: 'domcontentloaded', timeout: 60000 }).catch(() => {});
     firstPoll = false;
-    // Odota että taulu renderöityy (add-painike ilmestyy), sitten pieni asettuminen.
+    // Odota että taulu renderöityy (sarakeotsikko tai add-painike ilmestyy), sitten pieni asettuminen.
     await plannerPage.waitForSelector('[aria-label]', { timeout: 30000 }).catch(() => {});
     await plannerPage.waitForFunction(
-      () => [...document.querySelectorAll('[aria-label]')].some((e) => /(lisää tehtäväkortti|add task|add card)/i.test(e.getAttribute('aria-label') || '')),
+      () => [...document.querySelectorAll('[aria-label]')].some((e) => /(^(?:column|sarake)\s|lisää tehtäväkortti|add task|add card)/i.test(e.getAttribute('aria-label') || '')),
       { timeout: 30000 }
     ).catch(() => {});
     await plannerPage.waitForTimeout(1500).catch(() => {});
@@ -130,6 +142,10 @@ async function poll() {
     state.status = 'ok'; state.updatedAt = new Date().toISOString(); state.error = null;
     state.diag = `ok — ${state.count} tehtävää, sarakkeet: ${res.columns.map((c) => `${c.name}(${c.titles.length})`).join(', ')}`;
     console.log(`[planner] ${new Date().toLocaleTimeString('fi-FI')} — ${state.count} tehtävää (Uudet: ${state.uusi.length})`);
+    // Talleta tuore istuntotila (evästeet + localStorage) levylle, jotta kirjautuminen
+    // säilyy myös uudelleenkäynnistyksen yli — myös istuntoevästeet, joita profiili ei tallenna.
+    try { await context.storageState({ path: STATE_FILE }); }
+    catch (e) { console.log('[auth] tilan tallennus epäonnistui:', (e && e.message) || e); }
   } catch (e) {
     state.status = 'error'; state.error = String((e && e.message) || e);
     console.log('[planner] virhe:', state.error);
@@ -167,6 +183,17 @@ const start = async () => {
     viewport: { width: 1400, height: 1000 },
     args: ['--no-first-run']
   });
+  // Palauta aiemmin talletetut evästeet (myös istuntoevästeet) ennen navigointia.
+  try {
+    if (fs.existsSync(STATE_FILE)) {
+      const saved = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+      if (saved.cookies && saved.cookies.length) {
+        await context.addCookies(saved.cookies);
+        console.log(`[auth] palautettiin ${saved.cookies.length} evästettä (${STATE_FILE})`);
+      }
+    }
+  } catch (e) { console.log('[auth] tilan palautus epäonnistui:', (e && e.message) || e); }
+
   plannerPage = context.pages()[0] || await context.newPage();
   await plannerPage.goto(PLANNER_URL, { waitUntil: 'domcontentloaded', timeout: 60000 }).catch(() => {});
   if (!HEADLESS) { try { await plannerPage.bringToFront(); } catch (_) {} }

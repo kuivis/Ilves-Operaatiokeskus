@@ -86,26 +86,40 @@ Every source has an **embedded fallback** so the dashboard never goes blank.
   readable Graph token and reads its data from Microsoft's internal *taskmars* backend, so token/
   Graph approaches failed (`diag: "ei Graph-tokenia…"`). On start the Node server opens the **board
   in a visible Playwright window** (`plannerPage`) — you log in once (session persists in `.auth`).
-- **`scrapeBoard(page)`** reads the DOM by **aria-labels** (works FI + EN): columns are found via
-  the add-card buttons (`"Lisää tehtäväkortti sarakkeeseen {bucket}"` / `"Add task to bucket …"`),
-  and each column's container = the largest ancestor holding exactly that one add-button; task
-  cards inside it are `aria-label=" Tehtävä {title} "` (`"Task {title}"`). `buildBuckets` orders by
-  `BUCKET_ORDER` (`Uudet tehtävät`, `Työn alla`, **`Valmiit`**, …); `mapScraped` → the ticket shape
-  (`id` = short hash of the title; no priority/date from scraping). **Verified against the real
-  saved board DOM** (`Operaatiokeskus tehtävät.html`) — it extracted the columns + tasks correctly.
-- Each 60 s poll **reloads `plannerPage`**, waits for the board to render (`waitForFunction` on an
-  add-card button, ~30 s), then scrapes. First poll skips the reload (`goto` just loaded it).
+- **`scrapeBoard(page)`** reads the DOM by **aria-labels** (works FI + EN): columns are anchored on
+  the **column-header** label (`"Column {bucket}, Use Ctrl+Alt+…"` / `"Sarake {bucket}, …"`, regex
+  `colRe`), and each column's container = the largest ancestor holding exactly that one header; task
+  cards inside it are `aria-label="Task {title}"` (`"Tehtävä {title}"`, `taskRe`). **Note:** it used
+  to key off the add-card button (`"Lisää tehtäväkortti sarakkeeseen {bucket}"`), but Planner renamed
+  that label to `"Add task card in {bucket} column"` (name moved to the middle) — the header anchor is
+  more stable, so the add-button is now only used for diagnostics + the render-wait. `buildBuckets`
+  orders by `BUCKET_ORDER` (`Uudet tehtävät`, `Työn alla`, **`Valmiit`**, …); `mapScraped` → the
+  ticket shape (`id` = short hash of the title; no priority/date from scraping).
+- Each 60 s poll **reloads `plannerPage`**, waits for the board to render (`waitForFunction` on a
+  column-header or add-card label, ~30 s), then scrapes. First poll skips the reload (`goto` just
+  loaded it).
 - Serves `GET /api/tickets` (CORS `*`) → `{status:'ok'|'awaiting-login'|'error', buckets:[…],
   uusi:[…], count, diag}`. **`uusi` = the `Uudet tehtävät` column.** Dashboard's Uudet-tiketit
   panel reads `j.uusi`; the **Käsittelyssä** panel (`opsFrom`) pulls the **`Työn alla`** column;
   the popup reads `j.buckets`. Override host with `?ticketApi=`, plan with env `PLAN_ID`.
 - **Diagnose** via `GET /api/debug` (add-button labels found, task-card count, per-column titles,
   and a `sampleLabels` dump) + `[planner]` console lines. `awaiting-login` + "ei sarakkeita luettu"
-  = login not finished / board didn't render / the aria-labels changed (check `sampleLabels`).
+  = login not finished / board didn't render / the aria-labels changed (check `sampleLabels` — that's
+  how the header-anchor change above was diagnosed).
+- **Login persistence:** the `.auth` **persistent profile** does *not* keep Microsoft's **session
+  cookies** (they live in memory), and Planner in Playwright Chromium **doesn't show the "Pysytäänkö
+  kirjautuneena?" (KMSI) prompt** that would make them persistent. So after each successful read the
+  server writes the full `context.storageState()` (cookies **incl. session** + localStorage) to
+  `.auth/storage-state.json`, and re-injects those cookies via `context.addCookies()` on startup
+  (logs `[auth] palautettiin N evästettä`). Sign in once → later `npm start`s skip the login. The
+  state is only saved on `status:'ok'`, so a failed scrape never overwrites a good session. Session
+  cookies still expire eventually (hours–~day cold), so an occasional re-login is normal.
 - Startup is guarded by `if (require.main === module) start()`; `module.exports` exposes
   `shortId`/`mapScraped`/`buildBuckets` for unit tests (no Playwright needed).
-- Run: `cd ticket-server && npm install && npm start`. `HEADLESS=1` runs headless (only works
-  once `.auth` is warm). Session persists in `ticket-server/.auth` (git-ignored, secret).
+- Run: `cd ticket-server && npm install && npx playwright install chromium && npm start`.
+  `HEADLESS=1` runs headless (only works once `.auth` is warm). Cross-platform (macOS/Windows) — the
+  "Windows" bits are only the README's Node setup notes, since the TV is a Windows box. Session
+  persists in `ticket-server/.auth` (git-ignored, secret — includes `storage-state.json`).
 
 ## Conventions
 - **Visual identity**: Bricolage Grotesque; colors metsä `#005448`, meri `#00445E`, rusko
