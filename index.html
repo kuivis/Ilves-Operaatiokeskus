@@ -435,11 +435,15 @@ main{
       </div>
     </div>
 
-    <!-- SARAKE 4: uutiset -->
+    <!-- SARAKE 4: uutiset (Tiedotteet + Ilves NYT) -->
     <div class="col">
-      <div class="card news" style="flex:1 1 auto">
-        <div class="card-h"><span class="ic"><svg aria-hidden="true"><use href="#i-megaphone"/></svg></span><h2>Uutiset · ilves26</h2><span class="sub" id="newsStatus">–</span></div>
-        <div class="scroller"><div class="track" id="newsTrack"><div class="muted">Ladataan uutisia…</div></div></div>
+      <div class="card news tiedotteet-card" style="flex:1 1 50%">
+        <div class="card-h"><span class="ic"><svg aria-hidden="true"><use href="#i-megaphone"/></svg></span><h2>Tiedotteet · ilves26</h2><span class="sub" id="tiedotteetStatus">–</span></div>
+        <div class="scroller"><div class="track" id="tiedotteetTrack"><div class="muted">Ladataan tiedotteita…</div></div></div>
+      </div>
+      <div class="card news ilvesnyt-card" style="flex:1 1 50%">
+        <div class="card-h"><span class="ic"><svg aria-hidden="true"><use href="#i-mail"/></svg></span><h2>Ilves NYT</h2><span class="sub" id="ilvesNytStatus">–</span></div>
+        <div class="scroller"><div class="track" id="ilvesNytTrack"><div class="muted">Ladataan uutisia…</div></div></div>
       </div>
     </div>
   </main>
@@ -766,75 +770,103 @@ SCHED = scheduleFromBundle(SCHED_ICS_EMBED);
 
 /* ============ UUTISET (ilves26-sovellus) ============ */
 const NEWS_APP = '4406427';                       // ilves26 GoodBarber-sovellus
-const NEWS_SECTIONS = ['75180339', '77682659'];   // Tiedotteet + Ilves NYT
+const SEC_TIEDOTTEET = '75180339';                 // Tiedotteet
+const SEC_ILVES_NYT  = '77682659';                 // Ilves NYT
 
 function relTime(iso){
+  if (!iso) return '';
   const p = helParts(iso), pn = helParts(Date.now());
   if (p.date === pn.date) return 'Tänään klo ' + p.hm.replace(':','.');
   const d = new Date(iso.slice(0,10)+'T00:00');
   return `${d.getDate()}.${d.getMonth()+1}. klo ${p.hm.replace(':','.')}`;
 }
-function renderNews(list, live){
-  const st = document.getElementById('newsStatus');
-  st.className = 'sub';
-  st.textContent = live ? ('Päivitetty ' + helParts(Date.now()).hm.replace(':','.')) : 'Tallennettu';
-  const track = document.getElementById('newsTrack');
+
+function renderNewsSection(trackId, statusId, list, live){
+  const st = document.getElementById(statusId);
+  if (st) {
+    st.className = 'sub';
+    st.textContent = live ? ('Päivitetty ' + helParts(Date.now()).hm.replace(':','.')) : 'Tallennettu';
+  }
+  const track = document.getElementById(trackId);
+  if (!track) return;
+  if (!list || !list.length) {
+    track.innerHTML = '<div class="muted">Ei artikkeleita</div>';
+    return;
+  }
   track.innerHTML = list.map(a => `
-    <a class="art" href="${a.url}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">
+    <a class="art" href="${a.url||'#'}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">
       ${a.thumb ? `<div class="thumb"><img src="${a.thumb}" alt="" loading="lazy"></div>` : ''}
       <div class="meta">
-        <div class="kick">${a.author||'ilves26'} · ${relTime(a.date)}</div>
-        <div class="at">${a.title||''}</div>
-        <div class="ax">${(a.summary||a.excerpt||'').trim()}</div>
+        <div class="kick">${esc(a.author||'ilves26')} · ${relTime(a.date)}</div>
+        <div class="at">${esc(a.title||'')}</div>
+        <div class="ax">${esc((a.summary||'').trim())}</div>
       </div>
     </a>`).join('');
-  setupAutoScroll();
-}
-async function loadNews(){
-  // Tiedotteet + Ilves NYT suoraan ilves26-sovelluksen (GoodBarber) rajapinnasta, yhdistettynä.
-  const strip = h => (h||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
-  try{
-    const results = await Promise.all(NEWS_SECTIONS.map(sec =>
-      fetch(`https://api.ww-api.com/front/get_items/${NEWS_APP}/${sec}/`, { headers:{ Accept:'application/json' }})
-        .then(r => r.ok ? r.json() : null)
-        .then(j => (j && (j.items || j[sec])) || [])
-        .catch(() => [])
-    ));
-    const arr = results.flat();
-    if (arr.length){
-      const list = arr.map(a => ({
-        title:a.title, author:a.author, date:a.date, url:a.url,
-        thumb:a.thumbnail || a.smallThumbnail || a.largeThumbnail || '',
-        summary: a.summary || a.leadin || strip(a.content).slice(0,180)
-      })).sort((x,y) => String(y.date).localeCompare(String(x.date)));
-      renderNews(list, true);
-      return;
-    }
-  }catch(e){ /* CORS/tyhjä */ }
-  const st = document.getElementById('newsStatus');
-  st.className = 'sub'; st.textContent = 'Ei yhteyttä';
-  document.getElementById('newsTrack').innerHTML = '<div class="muted">Uutisia ei juuri nyt saatavilla.</div>';
 }
 
-/* ---- pystysuora auto-scroll vain jos sisältö ei mahdu ---- */
-let scrollTimer = null;
-function setupAutoScroll(){
-  if (scrollTimer) { clearInterval(scrollTimer); scrollTimer = null; }
-  const scroller = document.querySelector('.news .scroller');
-  const track = document.getElementById('newsTrack');
-  if (!scroller || !track) return;
-  let y = 0, dir = 1, hold = 90;
-  track.style.transform = 'translateY(0)';
-  scrollTimer = setInterval(() => {
-    // mittaa ylivuoto joka tikillä → fontin/kuvien latautuminen ei voi jättää näkymää väärään kohtaan
-    const overflow = track.scrollHeight - scroller.clientHeight;
-    if (overflow <= 8){ if (y !== 0){ y = 0; track.style.transform = 'translateY(0)'; } return; }
-    if (hold > 0){ hold--; return; }
-    y += dir * 0.4;
-    if (y >= overflow){ y = overflow; dir = -1; hold = 90; }
-    if (y <= 0){ y = 0; dir = 1; hold = 90; }
-    track.style.transform = `translateY(${-y}px)`;
-  }, 40);
+let newsScrollTimers = [];
+function setupNewsAutoScroll(){
+  newsScrollTimers.forEach(t => clearInterval(t));
+  newsScrollTimers = [];
+
+  const configs = [
+    { card: '.tiedotteet-card', trackId: 'tiedotteetTrack' },
+    { card: '.ilvesnyt-card', trackId: 'ilvesNytTrack' }
+  ];
+
+  configs.forEach(c => {
+    const card = document.querySelector(c.card);
+    if (!card) return;
+    const scroller = card.querySelector('.scroller');
+    const track = document.getElementById(c.trackId);
+    if (!scroller || !track) return;
+    let y = 0, dir = 1, hold = 90;
+    track.style.transform = 'translateY(0)';
+    const timer = setInterval(() => {
+      const overflow = track.scrollHeight - scroller.clientHeight;
+      if (overflow <= 8){ if (y !== 0){ y = 0; track.style.transform = 'translateY(0)'; } return; }
+      if (hold > 0){ hold--; return; }
+      y += dir * 0.4;
+      if (y >= overflow){ y = overflow; dir = -1; hold = 90; }
+      if (y <= 0){ y = 0; dir = 1; hold = 90; }
+      track.style.transform = `translateY(${-y}px)`;
+    }, 40);
+    newsScrollTimers.push(timer);
+  });
+}
+
+async function loadNewsSection(sectionId, trackId, statusId, limit = 3){
+  const strip = h => (h||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
+  try {
+    const r = await fetch(`https://api.ww-api.com/front/get_items/${NEWS_APP}/${sectionId}/`, { headers:{ Accept:'application/json' }});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    const raw = (j && (j.items || j[sectionId])) || [];
+    if (raw.length){
+      const list = raw.map(a => ({
+        title: a.title, author: a.author, date: a.date, url: a.url,
+        thumb: a.thumbnail || a.smallThumbnail || a.largeThumbnail || '',
+        summary: a.summary || a.leadin || strip(a.content).slice(0,180)
+      }))
+      .sort((x,y) => String(y.date).localeCompare(String(x.date)))
+      .slice(0, limit);
+
+      renderNewsSection(trackId, statusId, list, true);
+      return;
+    }
+  } catch(e) {}
+  const st = document.getElementById(statusId);
+  if (st) { st.className = 'sub'; st.textContent = 'Ei yhteyttä'; }
+  const el = document.getElementById(trackId);
+  if (el) el.innerHTML = '<div class="muted">Ei artikkeleita saatavilla.</div>';
+}
+
+async function loadNews(){
+  await Promise.all([
+    loadNewsSection(SEC_TIEDOTTEET, 'tiedotteetTrack', 'tiedotteetStatus', 3),
+    loadNewsSection(SEC_ILVES_NYT, 'ilvesNytTrack', 'ilvesNytStatus', 3)
+  ]);
+  setupNewsAutoScroll();
 }
 
 /* ============ TIKETIT-POPUP (tiketti-palvelimelta, vain "Uusi") ============ */
