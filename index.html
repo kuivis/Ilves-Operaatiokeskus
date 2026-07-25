@@ -775,9 +775,10 @@ const SEC_ILVES_NYT  = '77682659';                 // Ilves NYT
 
 function relTime(iso){
   if (!iso) return '';
-  const p = helParts(iso), pn = helParts(Date.now());
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const p = helParts(d), pn = helParts(Date.now());
   if (p.date === pn.date) return 'Tänään klo ' + p.hm.replace(':','.');
-  const d = new Date(iso.slice(0,10)+'T00:00');
   return `${d.getDate()}.${d.getMonth()+1}. klo ${p.hm.replace(':','.')}`;
 }
 
@@ -838,7 +839,8 @@ function setupNewsAutoScroll(){
 async function loadNewsSection(sectionId, trackId, statusId, limit = 3){
   const strip = h => (h||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
   try {
-    const r = await fetch(`https://api.ww-api.com/front/get_items/${NEWS_APP}/${sectionId}/`, { headers:{ Accept:'application/json' }});
+    const url = `https://api.ww-api.com/front/get_items/${NEWS_APP}/${sectionId}/?_=${Date.now()}`;
+    const r = await fetch(url, { cache: 'no-store', headers:{ Accept:'application/json' }});
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const j = await r.json();
     const raw = (j && (j.items || j[sectionId])) || [];
@@ -848,7 +850,7 @@ async function loadNewsSection(sectionId, trackId, statusId, limit = 3){
         thumb: a.thumbnail || a.smallThumbnail || a.largeThumbnail || '',
         summary: a.summary || a.leadin || strip(a.content).slice(0,180)
       }))
-      .sort((x,y) => String(y.date).localeCompare(String(x.date)))
+      .sort((x,y) => new Date(y.date).getTime() - new Date(x.date).getTime())
       .slice(0, limit);
 
       renderNewsSection(trackId, statusId, list, true);
