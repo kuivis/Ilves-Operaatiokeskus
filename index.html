@@ -942,7 +942,7 @@ async function loadUusi(){
       const list = j.uusi || j.tickets || [];
       renderUusi(list); setBadge(list.length);
       st.textContent = list.length ? `${list.length} uutta` : 'Ei uusia';
-      renderOps(opsFrom(j.buckets));
+      renderOps(opsFrom(j.buckets, j.kasittelyssa));
     } else if (j.status === 'awaiting-login'){
       document.getElementById('uusiBody').innerHTML = `<div class="muted">Kirjaudu tiketti-palvelimen ikkunassa nähdäksesi tiketit.</div>`;
       st.textContent = 'Kirjaudu'; setBadge(0);
@@ -960,7 +960,11 @@ async function loadUusi(){
 }
 
 /* ============ KÄSITTELYSSÄ (Planner: Työn alla -sarake) ============ */
-function opsFrom(buckets){ const b=(buckets||[]).find(x=>x.name==='Työn alla'); return b?b.tickets:[]; }
+function opsFrom(buckets, kasittelyssa){
+  if (Array.isArray(kasittelyssa) && kasittelyssa.length) return kasittelyssa;
+  const b = (buckets||[]).find(x => /^työn alla$/i.test((x.name||'').trim()) || /^käsittelyssä$/i.test((x.name||'').trim()) || /työn alla|käsittelyssä/i.test(x.name));
+  return b ? b.tickets : [];
+}
 function opsNote(status, html){ document.getElementById('opsStatus').textContent = status; document.getElementById('opsBody').innerHTML = html; }
 function renderOps(list){
   document.getElementById('opsStatus').textContent = list.length ? `${list.length} kpl` : 'Ei nyt';

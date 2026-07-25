@@ -32,11 +32,12 @@ const PLAN_ID = process.env.PLAN_ID || 'w2Y2pqVlOkKDXrV2TiaYxJYAF5oR';
 const PLANNER_URL = `https://planner.cloud.microsoft/webui/plan/${PLAN_ID}/view/board`;
 // Panelointi: "Uudet tehtävät" → Uudet tiketit, "Työn alla" → Käsittelyssä.
 const NEW_BUCKET = 'Uudet tehtävät';
+const IN_PROGRESS_BUCKET = 'Työn alla';
 // Sarakejärjestys näyttöä varten (tuntemattomat loppuun aakkosjärjestyksessä).
 const BUCKET_ORDER = ['Uudet tehtävät', 'Työn alla', 'Valmiit', 'Valmis', 'Tehty', 'Done'];
 
 // --- palvelimen tila (välimuisti dashboardille) ---
-const state = { status: 'starting', buckets: [], uusi: [], count: 0, updatedAt: null, error: null, diag: null };
+const state = { status: 'starting', buckets: [], uusi: [], kasittelyssa: [], count: 0, updatedAt: null, error: null, diag: null };
 let debugInfo = { addButtons: [], taskCards: 0, url: '', sampleLabels: [] };
 let context = null;
 let plannerPage = null;
@@ -74,10 +75,7 @@ async function scrapeBoard(page) {
   return page.evaluate(() => {
     const norm = (s) => (s || '').replace(/\s+/g, ' ').trim();
     const all = [...document.querySelectorAll('[aria-label]')];
-    // Sarakeotsikko: "Column Uudet tehtävät, Use Ctrl+…" (EN) / "Sarake Uudet tehtävät, …" (FI).
     const colRe = /^(?:column|sarake)\s+(.+?)\s*(?:,|$)/i;
-    // Lisää-kortti-painike (vain diagnostiikkaan / renderöitymisen odotukseen). Useita muotoja:
-    //  "Add task card in {nimi} column", "Add task to bucket {nimi}", "Lisää tehtäväkortti sarakkeeseen {nimi}".
     const addPrefix = /(lisää tehtäväkortti|add task|add card|new task)/i;
     const taskRe = /^(?:tehtävä|task)\s+(.+)$/i;                                        // "Task {otsikko}"
 
@@ -85,29 +83,71 @@ async function scrapeBoard(page) {
       .map((e) => norm(e.getAttribute('aria-label')))
       .filter((l) => addPrefix.test(l));
 
-    // Kullekin sarakeotsikolle: etsi kontti = suurin esi-isä, jossa on täsmälleen tämä yksi
-    // sarakeotsikko, ja kerää sen sisältä tehtäväkortit.
-    const isCol = (e) => colRe.test(norm(e.getAttribute('aria-label')));
-    const columns = [];
-    for (const h of all) {
-      if (!isCol(h)) continue;
-      const name = norm(colRe.exec(norm(h.getAttribute('aria-label')))[1]);
-      if (!name || columns.some((c) => c.name === name)) continue;
-      let best = h.parentElement, node = h.parentElement;
-      while (node && node !== document.body) {
-        const heads = [...node.querySelectorAll('[aria-label]')].filter(isCol).length;
-        if (heads === 1) best = node; else if (heads > 1) break;
-        node = node.parentElement;
+    // Etsi sarake-ankkurit (otsikko tai lisää-painike) ja niiden X-sijainnit
+    const anchorMap = new Map();
+    for (const e of all) {
+      const label = norm(e.getAttribute('aria-label'));
+      let name = null;
+      const m1 = colRe.exec(label);
+      if (m1) {
+        name = norm(m1[1]);
+      } else {
+        const m2 = /^(?:add task card in|add task to bucket|lisää tehtäväkortti sarakkeeseen)\s+(.+?)(?:\s+(?:column|sarakkeeseen|sarake)|$)/i.exec(label);
+        if (m2) name = norm(m2[1]);
       }
-      const titles = [];
-      for (const e of (best || h.parentElement).querySelectorAll('[aria-label]')) {
-        const m = taskRe.exec(norm(e.getAttribute('aria-label')));
-        if (m) { const t = norm(m[1]); if (t && !titles.includes(t)) titles.push(t); }
+      if (!name) continue;
+
+      const r = e.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      if (!anchorMap.has(name) || (r.width > 0 && anchorMap.get(name).width === 0)) {
+        anchorMap.set(name, { name, el: e, left: r.left, width: r.width, cx });
       }
-      columns.push({ name, titles });
     }
-    const taskCards = all.filter((e) => taskRe.test(norm(e.getAttribute('aria-label')))).length;
-    const sampleLabels = [...new Set(all.map((e) => norm(e.getAttribute('aria-label'))).filter(Boolean))].slice(0, 40);
+
+    const colAnchors = [...anchorMap.values()];
+    // Järjestä sarakkeet vasemmalta oikealle
+    colAnchors.sort((a, b) => a.left - b.left);
+
+    // Kerää kaikki tehtäväkortit ja niiden X-sijainnit
+    const taskElements = [];
+    for (const e of all) {
+      const label = norm(e.getAttribute('aria-label'));
+      const m = taskRe.exec(label);
+      if (m) {
+        const title = norm(m[1]);
+        if (title) {
+          const r = e.getBoundingClientRect();
+          const cx = r.left + r.width / 2;
+          taskElements.push({ title, el: e, left: r.left, cx });
+        }
+      }
+    }
+
+    // Kohdista kukin tehtäväkortti lähimpään sarakkeeseen sen X-sijainnin perusteella
+    const colTitlesMap = new Map(colAnchors.map((c) => [c.name, []]));
+    for (const t of taskElements) {
+      if (!colAnchors.length) break;
+      let bestCol = colAnchors[0];
+      let minDist = Math.abs(t.cx - colAnchors[0].cx);
+      for (let i = 1; i < colAnchors.length; i++) {
+        const dist = Math.abs(t.cx - colAnchors[i].cx);
+        if (dist < minDist) {
+          minDist = dist;
+          bestCol = colAnchors[i];
+        }
+      }
+      const list = colTitlesMap.get(bestCol.name);
+      if (list && !list.includes(t.title)) list.push(t.title);
+    }
+
+    const columns = colAnchors.map((c) => ({
+      name: c.name,
+      titles: colTitlesMap.get(c.name) || []
+    }));
+
+    const taskCards = taskElements.length;
+    const sampleLabels = [...new Set(all.map((e) => norm(e.getAttribute('aria-label'))).filter(Boolean))].slice(0, 50);
+
     return { columns, addButtons, taskCards, url: location.href, sampleLabels };
   });
 }
@@ -138,10 +178,11 @@ async function poll() {
     }
     state.buckets = buildBuckets(res.columns);
     state.uusi = (state.buckets.find((b) => b.name === NEW_BUCKET) || { tickets: [] }).tickets;
+    state.kasittelyssa = (state.buckets.find((b) => b.name === IN_PROGRESS_BUCKET || b.name === 'Käsittelyssä' || /^työn alla$/i.test(b.name)) || { tickets: [] }).tickets;
     state.count = state.buckets.reduce((n, b) => n + b.count, 0);
     state.status = 'ok'; state.updatedAt = new Date().toISOString(); state.error = null;
     state.diag = `ok — ${state.count} tehtävää, sarakkeet: ${res.columns.map((c) => `${c.name}(${c.titles.length})`).join(', ')}`;
-    console.log(`[planner] ${new Date().toLocaleTimeString('fi-FI')} — ${state.count} tehtävää (Uudet: ${state.uusi.length})`);
+    console.log(`[planner] ${new Date().toLocaleTimeString('fi-FI')} — ${state.count} tehtävää (Uudet: ${state.uusi.length}, Käsittelyssä: ${state.kasittelyssa.length})`);
     // Talleta tuore istuntotila (evästeet + localStorage) levylle, jotta kirjautuminen
     // säilyy myös uudelleenkäynnistyksen yli — myös istuntoevästeet, joita profiili ei tallenna.
     try { await context.storageState({ path: STATE_FILE }); }
@@ -162,10 +203,10 @@ app.use((req, res, next) => {
 });
 app.get('/api/tickets', (_req, res) => res.json({
   status: state.status, updatedAt: state.updatedAt, count: state.count,
-  buckets: state.buckets, uusi: state.uusi, tickets: state.uusi, error: state.error, diag: state.diag
+  buckets: state.buckets, uusi: state.uusi, kasittelyssa: state.kasittelyssa, tickets: state.uusi, error: state.error, diag: state.diag
 }));
 app.get('/api/health', (_req, res) => res.json({
-  status: state.status, updatedAt: state.updatedAt, count: state.count, uusi: state.uusi.length, diag: state.diag, planId: PLAN_ID
+  status: state.status, updatedAt: state.updatedAt, count: state.count, uusi: state.uusi.length, kasittelyssa: state.kasittelyssa.length, diag: state.diag, planId: PLAN_ID
 }));
 // Diagnostiikka: mitä sivulta luettiin (auttaa jos scrape ei löydä tehtäviä)
 app.get('/api/debug', (_req, res) => res.json({
