@@ -1034,42 +1034,173 @@ function refreshRadar(){
 function startRadar(){ if (window.L) initRadar(); else setTimeout(startRadar, 200); }
 window.addEventListener('resize', () => radarMap && radarMap.invalidateSize());
 
-/* ============ KONFETTI (leiri etenee prosentin) ============ */
+/* ============ KONFETTI JA ILOTULITUS (leiri etenee prosentin / 50% easter egg / "I"-näppäin) ============ */
 const confettiCanvas = document.getElementById('confetti');
 const cctx = confettiCanvas.getContext('2d');
-let confetti = [], confettiRAF = null;
-const CONF_COLORS = ['#FF633A','#FF8940','#FFAE40','#005448','#F0A6CF','#6CB7E5'];
+let confetti = [], confettiRAF = null, fireworksTimer = null, mega50Triggered = false;
+const CONF_COLORS = ['#CE5738','#D9744A','#D39C2F','#80884f','#414a2c','#6c7a3f','#b5654a','#f5f1e8'];
+
 function sizeConfetti(){ confettiCanvas.width = innerWidth; confettiCanvas.height = innerHeight; }
 sizeConfetti(); window.addEventListener('resize', sizeConfetti);
+
 function celebrate(pct){
+  if (pct === 50 && !mega50Triggered){
+    mega50Triggered = true;
+    startMegaFireworks('🎆 Puoliväli saavutettu! Leiri 50 % takana! 🎆');
+    return;
+  }
   if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches){ showCelebrateToast(pct); return; }
   for (let i=0; i<170; i++){
-    confetti.push({ x: innerWidth*(0.1+Math.random()*0.8), y: -20 - Math.random()*innerHeight*0.3,
+    confetti.push({ type:'confetti', x: innerWidth*(0.1+Math.random()*0.8), y: -20 - Math.random()*innerHeight*0.3,
       vx:(Math.random()-0.5)*7, vy:2+Math.random()*5, r:5+Math.random()*8, rot:Math.random()*6.28,
       vr:(Math.random()-0.5)*0.35, color:CONF_COLORS[i%CONF_COLORS.length], shape:Math.random()<0.5?'rect':'circ' });
   }
   showCelebrateToast(pct);
   if (!confettiRAF) confettiRAF = requestAnimationFrame(confettiTick);
 }
+
+function launchRocket(){
+  const x = innerWidth * (0.1 + Math.random() * 0.8);
+  const targetY = innerHeight * (0.12 + Math.random() * 0.4);
+  const vy = -(11 + Math.random() * 6);
+  const vx = (Math.random() - 0.5) * 3;
+  const color = CONF_COLORS[Math.floor(Math.random() * CONF_COLORS.length)];
+  confetti.push({ type: 'rocket', x, y: innerHeight + 10, vx, vy, targetY, color });
+}
+
+function explodeFirework(x, y){
+  const count = 90 + Math.floor(Math.random() * 50);
+  const baseColor = CONF_COLORS[Math.floor(Math.random() * CONF_COLORS.length)];
+  const goldColor = '#D39C2F';
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2 + Math.random() * 9;
+    confetti.push({
+      type: 'spark',
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      r: 2 + Math.random() * 3.5,
+      color: Math.random() < 0.35 ? goldColor : (Math.random() < 0.5 ? baseColor : CONF_COLORS[i % CONF_COLORS.length]),
+      alpha: 1,
+      decay: 0.012 + Math.random() * 0.018,
+      gravity: 0.06
+    });
+  }
+}
+
+function spawnConfettiBurst(count){
+  for (let i = 0; i < count; i++) {
+    const fromLeft = Math.random() < 0.5;
+    confetti.push({
+      type: 'confetti',
+      x: fromLeft ? -10 : innerWidth + 10,
+      y: innerHeight * (0.1 + Math.random() * 0.7),
+      vx: fromLeft ? (5 + Math.random() * 9) : -(5 + Math.random() * 9),
+      vy: -(4 + Math.random() * 8),
+      r: 5 + Math.random() * 9,
+      rot: Math.random() * 6.28,
+      vr: (Math.random() - 0.5) * 0.4,
+      color: CONF_COLORS[i % CONF_COLORS.length],
+      shape: Math.random() < 0.5 ? 'rect' : 'circ'
+    });
+  }
+}
+
+function startMegaFireworks(text){
+  const toastText = text || '🎆 Puoliväli saavutettu! Leiri 50 % takana! 🎆';
+  showCelebrateToastText(toastText, 30000);
+
+  const startTime = Date.now();
+  const duration = 30000; // 30 sekuntia
+
+  if (fireworksTimer) clearInterval(fireworksTimer);
+
+  for (let i = 0; i < 6; i++) {
+    setTimeout(() => {
+      explodeFirework(innerWidth * (0.15 + Math.random() * 0.7), innerHeight * (0.15 + Math.random() * 0.45));
+    }, i * 140);
+  }
+  spawnConfettiBurst(250);
+
+  fireworksTimer = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    if (elapsed >= duration) {
+      clearInterval(fireworksTimer);
+      fireworksTimer = null;
+      return;
+    }
+    launchRocket();
+    if (Math.random() < 0.6) launchRocket();
+    if (Math.random() < 0.5) spawnConfettiBurst(50);
+  }, 320);
+
+  if (!confettiRAF) confettiRAF = requestAnimationFrame(confettiTick);
+}
+
 function confettiTick(){
   cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
-  confetti = confetti.filter(p => p.y < confettiCanvas.height + 40);
+  const nextConfetti = [];
   for (const p of confetti){
-    p.vy += 0.09; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vx *= 0.99;
-    cctx.save(); cctx.translate(p.x, p.y); cctx.rotate(p.rot); cctx.fillStyle = p.color;
-    if (p.shape==='rect') cctx.fillRect(-p.r/2, -p.r/2, p.r, p.r*0.6);
-    else { cctx.beginPath(); cctx.arc(0,0,p.r/2,0,6.283); cctx.fill(); }
-    cctx.restore();
+    if (p.type === 'rocket'){
+      p.x += p.vx; p.y += p.vy; p.vy += 0.05;
+      cctx.fillStyle = '#FFAE40';
+      cctx.beginPath();
+      cctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+      cctx.fill();
+      if (p.y <= p.targetY || p.vy >= -0.5){
+        explodeFirework(p.x, p.y);
+      } else {
+        nextConfetti.push(p);
+      }
+    } else if (p.type === 'spark'){
+      p.vx *= 0.96; p.vy *= 0.96; p.vy += p.gravity;
+      p.x += p.vx; p.y += p.vy; p.alpha -= p.decay;
+      if (p.alpha > 0){
+        cctx.save();
+        cctx.globalAlpha = Math.max(0, p.alpha);
+        cctx.fillStyle = p.color;
+        cctx.beginPath();
+        cctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        cctx.fill();
+        cctx.restore();
+        nextConfetti.push(p);
+      }
+    } else {
+      p.vy += 0.09; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vx *= 0.99;
+      if (p.y < confettiCanvas.height + 40){
+        cctx.save(); cctx.translate(p.x, p.y); cctx.rotate(p.rot); cctx.fillStyle = p.color;
+        if (p.shape==='rect') cctx.fillRect(-p.r/2, -p.r/2, p.r, p.r*0.6);
+        else { cctx.beginPath(); cctx.arc(0,0,p.r/2,0,6.283); cctx.fill(); }
+        cctx.restore();
+        nextConfetti.push(p);
+      }
+    }
   }
+  confetti = nextConfetti;
   if (confetti.length) confettiRAF = requestAnimationFrame(confettiTick);
   else { confettiRAF = null; cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); }
 }
-function showCelebrateToast(pct){
+
+function showCelebrateToastText(text, durationMs = 4200){
   let el = document.getElementById('celebrateToast');
   if (!el){ el = document.createElement('div'); el.id = 'celebrateToast'; document.querySelector('.app').appendChild(el); }
-  el.innerHTML = `🎉 Leiri <b>${pct} %</b> takana!`;
+  el.innerHTML = text;
+  el.style.animationDuration = (durationMs / 1000) + 's';
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
 }
+
+function showCelebrateToast(pct){
+  showCelebrateToastText(`🎉 Leiri <b>${pct} %</b> takana!`, 4200);
+}
+
+/* Keyboard shortcut: "I" / "i" triggers the 30s fireworks easter egg */
+window.addEventListener('keydown', e => {
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
+  if (e.key === 'i' || e.key === 'I'){
+    startMegaFireworks('🎆 ILVES26 PUOLIVÄLI! 🎆');
+  }
+});
 
 /* ============ TIKETIT-POPUP: kaikki statukset ============ */
 // Planner-sarakkeiden värit (ilves26-paletti)

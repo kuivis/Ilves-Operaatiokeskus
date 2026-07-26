@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="theme-color" content="#80884f" />
+<title>Sää ja Sadetutka · ilves26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<style>
+:root{
+  --metsa:#80884f; --forest:#414a2c; --meri:#6c7a3f; --rusko:#6b4a34; --savu:#F5F1E8;
+  --punainen:#CE5738; --oranssi:#D9744A; --kulta:#D39C2F;
+  --ink:#201f1a;
+  --ink-2:#5c5a4e;
+  --ink-3:#9a978a;
+  --card:#fff;
+  --line:#e6decb;
+  --shadow:0 1px 2px rgba(30,26,18,.05), 0 4px 12px rgba(30,26,18,.07);
+  --radius:1rem;
+  --head:"Nunito",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --body:"Jost","Nunito",-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px; -webkit-tap-highlight-color:transparent;}
+body{
+  font-family:var(--head); background:var(--savu); color:var(--ink);
+  min-height:100vh; padding:.8rem; overflow-x:hidden; -webkit-font-smoothing:antialiased;
+  line-height:1.25;
+}
+.mobile-app{display:flex; flex-direction:column; gap:.8rem; max-width:600px; margin:0 auto;}
+
+.card{
+  --accent:var(--meri);
+  position:relative; background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+  border:1px solid var(--line); padding:1rem; display:flex; flex-direction:column;
+}
+.card-h{display:flex; align-items:center; gap:.6rem; margin-bottom:.75rem; padding-bottom:.55rem; border-bottom:1px solid var(--line);}
+.card-h .ic{flex:0 0 auto; width:2rem; height:2rem; display:grid; place-items:center; border-radius:50%; background:var(--accent);}
+.card-h .ic svg{width:1.15rem; height:1.15rem; fill:none; stroke:#fff; stroke-width:2.3; stroke-linecap:round; stroke-linejoin:round;}
+.card-h h2{font-size:.9rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink);}
+.card-h .sub{margin-left:auto; font-size:.8rem; font-weight:600; color:var(--ink-3);}
+
+/* ===== Sää ===== */
+.wnow{display:flex; align-items:center; gap:.8rem}
+.wnow .sym{font-size:3.5rem; line-height:1; flex:0 0 auto}
+.wnow .temp{font-size:3.5rem; font-weight:800; line-height:.9; font-variant-numeric:tabular-nums}
+.wnow .wmeta{display:flex; flex-direction:column; gap:.15rem}
+.wnow .desc{font-size:1.05rem; font-weight:700}
+.wnow .feels{font-size:.88rem; color:#7a766c}
+.wgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin-top:.85rem}
+.wcell{background:#f6efdf; border-radius:.7rem; padding:.5rem .4rem; text-align:center}
+.wcell .v{font-size:1.25rem; font-weight:800; font-variant-numeric:tabular-nums; color:var(--meri)}
+.wcell .k{font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:#9a958a; margin-top:.15rem}
+.whours{display:flex; gap:.35rem; margin-top:.8rem; justify-content:space-between}
+.whour{flex:1 1 0; text-align:center; background:#f6efdf; border-radius:.7rem; padding:.45rem .2rem}
+.whour .h{font-size:.72rem; color:#9a958a; font-weight:600}
+.whour .e{font-size:1.35rem; line-height:1.2}
+.whour .t{font-size:.9rem; font-weight:800; color:var(--meri); font-variant-numeric:tabular-nums}
+.fire{
+  margin-top:.8rem; border-radius:.8rem; padding:.65rem .8rem; display:flex; align-items:center; gap:.6rem;
+  font-weight:700; font-size:.92rem;
+}
+.fire .fic{flex:0 0 auto; line-height:1; display:grid; place-items:center}
+.fire .fic svg{width:1.35rem; height:1.35rem; fill:none; stroke:currentColor; stroke-width:2.1; stroke-linecap:round; stroke-linejoin:round}
+.fire.ok{background:rgba(0,84,72,.10); color:var(--metsa)}
+.fire.warn{background:var(--punainen); color:#fff; animation:pulse 2.4s ease-in-out infinite}
+.fire .sml{display:block; font-weight:500; font-size:.78rem; opacity:.85}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,99,58,.5)}50%{box-shadow:0 0 0 .6rem rgba(255,99,58,0)}}
+
+/* ===== Sadetutka ===== */
+.radarwrap{position:relative; height:16rem; border-radius:.85rem; overflow:hidden; background:#dfe7ea; isolation:isolate}
+#radarmap{position:absolute; inset:0}
+.leaflet-container{background:#dfe7ea; font-family:var(--head)}
+.radarnote{position:absolute; left:.55rem; bottom:.55rem; z-index:500; background:rgba(0,68,94,.85); color:var(--savu);
+  font-size:.7rem; font-weight:700; padding:.25rem .55rem; border-radius:999px; pointer-events:none}
+.radardot{position:absolute; left:50%; top:50%; z-index:500; width:.85rem; height:.85rem; margin:-.42rem 0 0 -.42rem;
+  border-radius:50%; background:var(--punainen); box-shadow:0 0 0 .25rem rgba(255,99,58,.35); pointer-events:none}
+
+.muted{color:#a49f92; font-size:.9rem; font-weight:500}
+.spin{display:inline-block; width:.9rem; height:.9rem; border:.16rem solid #d8cfba; border-top-color:var(--oranssi);
+  border-radius:50%; animation:sp .8s linear infinite; vertical-align:-.15rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-weather" viewBox="0 0 24 24"><circle cx="8" cy="8" r="2.5"/><path d="M8 3.6v1.1M3.6 8h1.1M4.9 4.9l.8.8M11.1 4.9l-.8.8"/><path d="M9.5 19h7.5a3.1 3.1 0 0 0 .3-6.2A4.5 4.5 0 0 0 8.7 12.2 3.4 3.4 0 0 0 9.5 19z"/></symbol>
+  <symbol id="i-radar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.2"/><path d="M12 12 18.5 8.2"/><circle cx="12" cy="12" r="1"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z"/><path d="M9 12l2 2 3.5-4"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.6 2.6-4.9C9 9 10.4 6.6 12 3z"/><path d="M12 20a2.3 2.3 0 0 0 2.3-2.3c0-1.4-1.1-2.1-2.3-3.4-1.2 1.3-2.3 2-2.3 3.4A2.3 2.3 0 0 0 12 20z"/></symbol>
+</svg>
+
+<div class="mobile-app">
+  <!-- Sää-widget -->
+  <div class="card weather">
+    <div class="card-h">
+      <span class="ic"><svg aria-hidden="true"><use href="#i-weather"/></svg></span>
+      <h2>Sää · Evo, Hämeenlinna</h2>
+      <span class="sub" id="wStatus"><span class="spin"></span></span>
+    </div>
+    <div id="weatherBody" class="muted">Ladataan säätietoja…</div>
+  </div>
+
+  <!-- Sadetutka-widget -->
+  <div class="card radar">
+    <div class="card-h">
+      <span class="ic"><svg aria-hidden="true"><use href="#i-radar"/></svg></span>
+      <h2>Sadetutka · Evo</h2>
+      <span class="sub" id="radarStatus">FMI</span>
+    </div>
+    <div class="radarwrap">
+      <div id="radarmap"></div>
+      <div class="radardot"></div>
+      <div class="radarnote">Ilmatieteen laitos · sadetutka</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TZ = 'Europe/Helsinki';
+const EVO = { lat: 61.208, lon: 25.128, name: 'Evo' };
+
+function helParts(d){
+  const s = new Date(d).toLocaleString('sv-SE', { timeZone: TZ });
+  return { date: s.slice(0,10), hm: s.slice(11,16), h: +s.slice(11,13), m: +s.slice(14,16) };
+}
+const num = (v, dec=0) => (v==null||isNaN(v)) ? '–' : v.toFixed(dec);
+
+/* ============ SÄÄ (Ilmatieteen laitos, WFS) ============ */
+const SMART = {
+  1:['☀️','Selkeää'], 2:['🌤️','Enimmäkseen selkeää'], 4:['⛅','Puolipilvistä'],
+  6:['🌥️','Enimmäkseen pilvistä'], 7:['☁️','Pilvistä'], 9:['🌫️','Sumua'],
+  71:['🌫️','Utua'], 21:['🌦️','Heikkoja kuuroja'], 22:['🌦️','Sadekuuroja'], 23:['🌧️','Voimakkaita kuuroja'],
+  31:['🌧️','Heikkoa vesisadetta'], 32:['🌧️','Vesisadetta'], 33:['🌧️','Voimakasta vesisadetta'],
+  41:['🌨️','Heikkoja lumikuuroja'], 42:['🌨️','Lumikuuroja'], 43:['🌨️','Voimakkaita lumikuuroja'],
+  51:['❄️','Heikkoa lumisadetta'], 52:['❄️','Lumisadetta'], 53:['❄️','Voimakasta lumisadetta'],
+  61:['⛈️','Ukkoskuuroja'], 64:['⛈️','Voimakkaita ukkoskuuroja'],
+  81:['🌨️','Heikkoja räntäkuuroja'], 82:['🌨️','Räntäkuuroja'], 83:['🌨️','Voimakkaita räntäkuuroja']
+};
+function symbolInfo(code){
+  if (code == null || isNaN(code)) return ['🌡️','–'];
+  const night = code >= 100; let c = night ? code - 100 : code;
+  const info = SMART[c] || SMART[Math.floor(c/10)*10] || ['🌡️','Vaihtelevaa'];
+  if (night && info[0] === '☀️') return ['🌙', 'Selkeää'];
+  if (night && info[0] === '🌤️') return ['🌙','Enimmäkseen selkeää'];
+  return info;
+}
+function parseSeries(xml){
+  const out = {};
+  const doc = new DOMParser().parseFromString(xml, 'text/xml');
+  const series = doc.getElementsByTagNameNS('*','MeasurementTimeseries');
+  for (const s of series){
+    const id = s.getAttribute('gml:id') || s.getAttributeNS('http://www.opengis.net/gml/3.2','id') || s.id || '';
+    const param = id.split('-').pop();
+    const pts = [];
+    const nodes = s.getElementsByTagNameNS('*','MeasurementTVP');
+    for (const n of nodes){
+      const t = n.getElementsByTagNameNS('*','time')[0];
+      const v = n.getElementsByTagNameNS('*','value')[0];
+      if (!t || !v) continue;
+      pts.push({ t: new Date(t.textContent.trim()), v: parseFloat(v.textContent.trim()) });
+    }
+    out[param] = pts;
+  }
+  return out;
+}
+function nearestNow(pts){
+  if (!pts || !pts.length) return null;
+  const now = Date.now();
+  let best = pts[0], bd = Infinity;
+  for (const p of pts){ const dd = Math.abs(p.t.getTime()-now); if (dd < bd){ bd = dd; best = p; } }
+  return best;
+}
+function windDir(deg){
+  if (deg==null||isNaN(deg)) return '';
+  const dirs = ['pohjoisesta','koillisesta','idästä','kaakosta','etelästä','lounaasta','lännestä','luoteesta'];
+  return dirs[Math.round(deg/45)%8];
+}
+
+async function loadWeather(){
+  const params = 'Temperature,FeelsLike,WindSpeedMS,WindDirection,SmartSymbol,Precipitation1h,Humidity,ForestFireWarning';
+  const start = new Date(Date.now() - 3600e3).toISOString().slice(0,19)+'Z';
+  const end   = new Date(Date.now() + 27*3600e3).toISOString().slice(0,19)+'Z';
+  const url = 'https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=getFeature'
+    + '&storedquery_id=fmi::forecast::edited::weather::scandinavia::point::timevaluepair'
+    + `&latlon=${EVO.lat},${EVO.lon}&parameters=${params}&timestep=60&starttime=${start}&endtime=${end}`;
+  const statusEl = document.getElementById('wStatus');
+  try{
+    const r = await fetch(url); if (!r.ok) throw new Error('HTTP '+r.status);
+    const xml = await r.text();
+    const S = parseSeries(xml);
+    renderWeather(S);
+    statusEl.innerHTML = 'Päivitetty ' + helParts(Date.now()).hm.replace(':','.');
+  }catch(e){
+    statusEl.textContent = 'Ei yhteyttä';
+    document.getElementById('weatherBody').innerHTML =
+      '<div class="muted">Säätietojen haku ei onnistunut. Yritetään uudelleen…</div>';
+  }
+}
+function renderWeather(S){
+  const cur = {
+    temp: nearestNow(S.Temperature), feels: nearestNow(S.FeelsLike),
+    wind: nearestNow(S.WindSpeedMS), dir: nearestNow(S.WindDirection),
+    sym: nearestNow(S.SmartSymbol), rain: nearestNow(S.Precipitation1h),
+    hum: nearestNow(S.Humidity)
+  };
+  const [emoji, desc] = symbolInfo(cur.sym ? cur.sym.v : null);
+  const t = cur.temp ? cur.temp.v : null;
+  const feels = cur.feels ? cur.feels.v : null;
+  const wind = cur.wind ? cur.wind.v : null;
+  const dir = cur.dir ? windDir(cur.dir.v) : '';
+
+  const now = Date.now();
+  const future = (S.Temperature||[]).filter(p => p.t.getTime() >= now - 1800e3);
+  const strip = [];
+  for (let i=0; i<future.length && strip.length<5; i+=3) strip.push(future[i]);
+
+  const hoursHtml = strip.map(p => {
+    const hp = helParts(p.t);
+    const symp = (S.SmartSymbol||[]).find(x => x.t.getTime()===p.t.getTime());
+    const [e] = symbolInfo(symp ? symp.v : null);
+    return `<div class="whour"><div class="h">${hp.hm.replace(':','.')}</div><div class="e">${e}</div><div class="t">${num(p.v)}°</div></div>`;
+  }).join('');
+
+  const ff = S.ForestFireWarning || [];
+  const active = ff.some(p => !isNaN(p.v) && p.v >= 2);
+  const fireHtml = active
+    ? `<div class="fire warn"><span class="fic"><svg aria-hidden="true"><use href="#i-flame"/></svg></span><div>Metsäpalovaroitus voimassa<span class="sml">Avotulen teko kielletty · Ilmatieteen laitos</span></div></div>`
+    : `<div class="fire ok"><span class="fic"><svg aria-hidden="true"><use href="#i-shield"/></svg></span><div>Ei metsäpalovaroitusta<span class="sml">Noudata silti tulentekovarovaisuutta · Ilmatieteen laitos</span></div></div>`;
+
+  document.getElementById('weatherBody').innerHTML = `
+    <div class="wnow">
+      <div class="sym">${emoji}</div>
+      <div class="temp">${num(t)}°</div>
+      <div class="wmeta">
+        <div class="desc">${desc}</div>
+        <div class="feels">Tuntuu kuin ${num(feels)}°</div>
+      </div>
+    </div>
+    <div class="wgrid">
+      <div class="wcell"><div class="v">${cur.rain ? num(cur.rain.v, 1) : '–'} mm</div><div class="k">Sademäärä</div></div>
+      <div class="wcell"><div class="v">${num(wind, 1)} m/s</div><div class="k">Tuuli (${dir})</div></div>
+      <div class="wcell"><div class="v">${cur.hum ? num(cur.hum.v) : '–'} %</div><div class="k">Kosteus</div></div>
+    </div>
+    <div class="whours">${hoursHtml}</div>
+    ${fireHtml}
+  `;
+}
+
+/* ============ SADETUTKA (Ilmatieteen laitos, WMS) ============ */
+let radarMap = null, radarLayer = null;
+function initRadar(){
+  if (!window.L || radarMap) return;
+  const el = document.getElementById('radarmap'); if (!el) return;
+  radarMap = L.map(el, { center:[61.204934767500795, 25.1210434592283], zoom:8,
+    zoomControl:false, attributionControl:false, dragging:true, scrollWheelZoom:false,
+    doubleClickZoom:true, boxZoom:false, keyboard:false, touchZoom:true, tap:true, inertia:true, fadeAnimation:false });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { subdomains:'abcd', maxZoom:12, detectRetina:true }).addTo(radarMap);
+  radarLayer = L.tileLayer.wms('https://openwms.fmi.fi/geoserver/wms', {
+    layers:'Radar:suomi_dbz_eureffin', format:'image/png', transparent:true, opacity:0.6, version:'1.3.0'
+  }).addTo(radarMap);
+  refreshRadar();
+  setInterval(refreshRadar, 5*60*1000);
+  setTimeout(() => radarMap && radarMap.invalidateSize(), 500);
+}
+function refreshRadar(){
+  if (radarLayer) radarLayer.setParams({ ts: Date.now() });
+  const s = document.getElementById('radarStatus'); if (s) s.textContent = 'Päivitetty ' + helParts(Date.now()).hm.replace(':','.');
+}
+function startRadar(){ if (window.L) initRadar(); else setTimeout(startRadar, 200); }
+window.addEventListener('resize', () => radarMap && radarMap.invalidateSize());
+
+/* ============ KÄYNNISTYS ============ */
+loadWeather(); setInterval(loadWeather, 10*60*1000);
+startRadar();
+</script>
+</body>
+</html>
