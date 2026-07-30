@@ -1,0 +1,1240 @@
+<!doctype html>
+<html lang="fi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#CE5738" />
+    <title>Leiribingo · ilves26</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Jost:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --punainen: #CE5738;
+            --punainen-dark: #a83f23;
+            --metsa: #80884f;
+            --forest: #414a2c;
+            --meri: #6c7a3f;
+            --rusko: #6b4a34;
+            --savu: #F5F1E8;
+            --kulta: #D39C2F;
+            --kulta-bright: #f1b742;
+            --ink: #201f1a;
+            --ink-2: #5c5a4e;
+            --ink-3: #9a978a;
+            --card: #ffffff;
+            --line: #e6decb;
+            --shadow: 0 4px 12px rgba(32, 31, 26, 0.08);
+            --shadow-lg: 0 12px 28px rgba(32, 31, 26, 0.15);
+            --radius: 1.2rem;
+            --radius-sm: 0.8rem;
+            --head: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --body: "Jost", "Nunito", -apple-system, sans-serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 15px;
+            -webkit-tap-highlight-color: transparent;
+            background-color: var(--savu);
+        }
+
+        body {
+            font-family: var(--body);
+            background: var(--savu);
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 0 0 2rem 0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.3;
+        }
+
+        /* Header & Branding */
+        .header {
+            background: var(--punainen);
+            color: #fff;
+            padding: 1.25rem 1rem 2rem 1rem;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(206, 87, 56, 0.25);
+            text-align: center;
+        }
+
+        /* Scalloped wave pattern at bottom of header */
+        .header::after {
+            content: "";
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            right: 0;
+            height: 14px;
+            background-image: radial-gradient(circle 8px at 8px -2px, transparent 100%, var(--savu) 100%);
+            background-size: 16px 14px;
+            background-repeat: repeat-x;
+        }
+
+        .header-inner {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .logo-img {
+            height: 2.2rem;
+            width: auto;
+            max-width: 180px;
+        }
+
+        .header h1 {
+            font-family: var(--head);
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: -0.01em;
+            text-transform: uppercase;
+            margin-top: 0.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #fff;
+        }
+
+        .header p {
+            font-size: 0.95rem;
+            font-weight: 500;
+            opacity: 0.92;
+            max-width: 320px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 480px;
+            margin: 1.5rem auto 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Stats / Progress Bar */
+        .status-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 0.9rem 1.1rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-icon {
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 50%;
+            background: rgba(128, 136, 79, 0.12);
+            color: var(--metsa);
+            display: grid;
+            place-items: center;
+        }
+
+        .status-icon svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .status-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ink-3);
+        }
+
+        .status-val {
+            font-family: var(--head);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .bingo-badge {
+            background: var(--kulta);
+            color: #fff;
+            font-family: var(--head);
+            font-weight: 900;
+            font-size: 0.85rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            box-shadow: 0 2px 6px rgba(211, 156, 47, 0.35);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .bingo-badge.has-bingo {
+            transform: scale(1.05);
+            animation: pulse-badge 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-badge {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(211, 156, 47, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(211, 156, 47, 0);
+            }
+        }
+
+        /* Progress bar */
+        .progress-track {
+            height: 8px;
+            background: #EFE9DB;
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--punainen);
+            border-radius: 999px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 3x3 Bingo Grid */
+        .bingo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.65rem;
+            margin-top: 0.2rem;
+        }
+
+        .bingo-cell {
+            background: var(--card);
+            border: 2px solid var(--line);
+            border-radius: var(--radius);
+            aspect-ratio: 1 / 1;
+            padding: 0.6rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.25s ease,
+                border-color 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .bingo-cell:active {
+            transform: scale(0.94);
+        }
+
+        .bingo-cell .cell-text {
+            font-family: var(--head);
+            font-weight: 700;
+            font-size: 0.88rem;
+            line-height: 1.25;
+            color: var(--ink);
+            hyphens: auto;
+            word-break: break-word;
+            z-index: 2;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        /* Center cell highlight */
+        .bingo-cell.is-center {
+            border-color: rgba(206, 87, 56, 0.35);
+            background: #FFFBF5;
+        }
+
+        .bingo-cell.is-center::before {
+            content: "KESKIPISTE";
+            position: absolute;
+            top: 0.35rem;
+            font-size: 0.55rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: var(--punainen);
+            opacity: 0.75;
+        }
+
+        .cell-check-icon {
+            position: absolute;
+            bottom: 0.4rem;
+            right: 0.4rem;
+            width: 1.4rem;
+            height: 1.4rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            display: grid;
+            place-items: center;
+            opacity: 0;
+            transform: scale(0.4) rotate(-20deg);
+            transition: opacity 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 2;
+        }
+
+        .cell-check-icon svg {
+            width: 0.9rem;
+            height: 0.9rem;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Done State */
+        .bingo-cell.done {
+            background: var(--forest);
+            border-color: var(--metsa);
+            box-shadow: 0 6px 16px rgba(206, 87, 56, 0.3);
+        }
+
+        .bingo-cell.done .cell-text {
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+            transform: translateY(-0.25rem);
+        }
+
+        .bingo-cell.done .cell-check-icon {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        /* Line Win Glow effect */
+        .bingo-cell.in-line {
+            border-color: var(--kulta-bright) !important;
+            animation: line-glow 1.8s infinite alternate ease-in-out;
+        }
+
+        .bingo-cell.in-line::after {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: var(--radius);
+            border: 2px solid var(--kulta);
+            pointer-events: none;
+        }
+
+        @keyframes line-glow {
+            0% {
+                box-shadow: 0 0 4px rgba(211, 156, 47, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.2);
+            }
+
+            100% {
+                box-shadow: 0 0 18px rgba(211, 156, 47, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        /* Center cell counter controls */
+        .lava-counter-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: 0.35rem;
+            z-index: 4;
+        }
+
+        .lava-count-pill {
+            font-family: var(--head);
+            font-weight: 800;
+            font-size: 0.78rem;
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--ink);
+            padding: 0.15rem 0.45rem;
+            border-radius: 999px;
+            line-height: 1.2;
+            min-width: 2.7rem;
+            text-align: center;
+            user-select: none;
+        }
+
+        .bingo-cell.done .lava-count-pill {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .btn-counter {
+            width: 1.55rem;
+            height: 1.55rem;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            background: #ffffff;
+            color: var(--ink);
+            font-family: var(--head);
+            font-weight: 900;
+            font-size: 1.05rem;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+            transition: transform 0.12s ease, background 0.15s ease, opacity 0.15s ease;
+            line-height: 1;
+            user-select: none;
+            padding: 0;
+        }
+
+        .bingo-cell.done .btn-counter {
+            background: #ffffff;
+            color: var(--forest);
+            border-color: #ffffff;
+        }
+
+        .btn-counter:active {
+            transform: scale(0.85);
+        }
+
+        .btn-counter:disabled {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        /* Actions Footer */
+        .actions-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 0.8rem 1rem;
+            box-shadow: var(--shadow);
+            margin-top: 0.4rem;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1.5px solid var(--line);
+            color: var(--ink-2);
+            font-family: var(--head);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:active {
+            background: rgba(0, 0, 0, 0.05);
+            transform: scale(0.97);
+        }
+
+        .btn-secondary svg {
+            width: 1rem;
+            height: 1rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .info-note {
+            font-size: 0.78rem;
+            color: var(--ink-3);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        /* Canvas Confetti Overlay */
+        #confettiCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Toast Message */
+        .toast {
+            position: fixed;
+            bottom: calc(72px + 1.2rem);
+            left: 50%;
+            transform: translateX(-50%) translateY(300%);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            background: var(--ink);
+            color: #fff;
+            font-family: var(--head);
+            font-weight: 800;
+            font-size: 0.95rem;
+            padding: 0.75rem 1.4rem;
+            border-radius: 999px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 10000;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease, visibility 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* Mega Celebration Modal for 3x3 Complete */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(32, 31, 26, 0.75);
+            backdrop-filter: blur(6px);
+            z-index: 10001;
+            display: grid;
+            place-items: center;
+            padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+
+        .modal-backdrop.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: var(--savu);
+            border: 3px solid var(--kulta);
+            border-radius: 1.5rem;
+            padding: 2rem 1.5rem;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .modal-backdrop.show .modal-card {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-trophy {
+            width: 5rem;
+            height: 5rem;
+            background: var(--kulta);
+            color: #fff;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            box-shadow: 0 8px 20px rgba(211, 156, 47, 0.4);
+            animation: bounce-trophy 1.2s infinite ease-in-out alternate;
+        }
+
+        @keyframes bounce-trophy {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+
+            100% {
+                transform: translateY(-10px) scale(1.08);
+            }
+        }
+
+        .modal-trophy svg {
+            width: 2.8rem;
+            height: 2.8rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .modal-card h2 {
+            font-family: var(--head);
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--punainen);
+            text-transform: uppercase;
+            margin-top: 0.2rem;
+        }
+
+        .modal-card p {
+            font-size: 1rem;
+            color: var(--ink);
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .btn-primary {
+            background: var(--punainen);
+            color: #fff;
+            font-family: var(--head);
+            font-weight: 800;
+            font-size: 1.05rem;
+            padding: 0.75rem 1.8rem;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(206, 87, 56, 0.35);
+            margin-top: 0.5rem;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95);
+            background: var(--punainen-dark);
+        }
+    </style>
+</head>
+
+<body>
+
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <symbol id="i-check" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </symbol>
+        <symbol id="i-trophy" viewBox="0 0 24 24">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+            <path d="M4 22h16"></path>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"></path>
+        </symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24">
+            <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+            <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+            <path d="M3 21v-5h5"></path>
+        </symbol>
+        <symbol id="i-sparkles" viewBox="0 0 24 24">
+            <path
+                d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z">
+            </path>
+        </symbol>
+        <symbol id="i-star" viewBox="0 0 24 24">
+            <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+            </polygon>
+        </symbol>
+    </svg>
+
+    <header class="header">
+        <div class="header-inner">
+            <img src="assets/ilves26-logo-valk.svg" alt="ilves26" class="logo-img" onerror="this.style.display='none'">
+            <h1><svg style="width:1.5rem;height:1.5rem;fill:none;stroke:currentColor;stroke-width:2.2">
+                    <use href="#i-sparkles" />
+                </svg> Vaikuttajabingo</h1>
+            <p>Täytä ruudukkoa vaikuttajapäivän aikana. Montako pistettä saat kasaan?</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Progress / Stats Card -->
+        <div class="status-card">
+            <div class="status-row">
+                <div class="status-item">
+                    <div class="status-icon">
+                        <svg>
+                            <use href="#i-sparkles" />
+                        </svg>
+                    </div>
+                    <div class="status-text">
+                        <span class="status-label">Pisteitä yhteensä</span>
+                        <span class="status-val" id="progressText">0 p</span>
+                    </div>
+                </div>
+                <div class="bingo-badge" id="bingoBadge">
+                    <svg style="width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:2.2">
+                        <use href="#i-star" />
+                    </svg>
+                    <span id="bingoCountText">0 Bingoa</span>
+                </div>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- 3x3 Bingo Grid -->
+        <div class="bingo-grid" id="bingoGrid" role="grid" aria-label="3x3 Leiribingo ruudukko">
+            <!-- Grid items will be injected by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Canvas Overlay for Confetti -->
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toastMsg">
+        <span id="toastIcon">🎉</span>
+        <span id="toastText">BINGO!</span>
+    </div>
+
+    <!-- Mega Celebration Modal for Full Board -->
+    <div class="modal-backdrop" id="megaModal" aria-hidden="true">
+        <div class="modal-card">
+            <div class="modal-trophy">
+                <svg>
+                    <use href="#i-trophy" />
+                </svg>
+            </div>
+            <h2>KAIKKI TÄYNNÄ!</h2>
+            <p>Olet suorittanut jokaisen vaikuttajabingon tehtävän! Käy hakemassa helmesi Kaverilaaksosta 🌲✨</p>
+            <button class="btn-primary" id="btnCloseModal" type="button">Jatka juhlintaa! 🎉</button>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ilves26 Leiribingo Grid Configuration
+         * 3x3 layout with Lavaohjelma in the center (index 4).
+         */
+        const BINGO_ITEMS = [
+            "Postikortti",          // Row 1, Col 1
+            "Mielenosoitus",        // Row 1, Col 2
+            "Kiitokset ja kehut",   // Row 1, Col 3
+            "Päivän hyvä työ",      // Row 2, Col 1
+            "Lavaohjelma",          // Row 2, Col 2 (CENTER)
+            "Pinkkipartio",         // Row 2, Col 3
+            "Vastuullisuus",        // Row 3, Col 1
+            "Mielen hyvinvointi",   // Row 3, Col 2
+            "Niittykumpu"           // Row 3, Col 3
+        ];
+
+        // Winning combinations for 3x3 grid (3 horizontal, 3 vertical, 2 diagonal)
+        const WINNING_LINES = [
+            [0, 1, 2], // Row 1
+            [3, 4, 5], // Row 2
+            [6, 7, 8], // Row 3
+            [0, 3, 6], // Col 1
+            [1, 4, 7], // Col 2
+            [2, 5, 8], // Col 3
+            [0, 4, 8], // Diagonal top-left to bottom-right
+            [2, 4, 6]  // Diagonal top-right to bottom-left
+        ];
+
+        const STORAGE_KEY = 'ilves26_bingo_cells_v1';
+        const STORAGE_KEY_LAVA = 'ilves26_bingo_lava_count_v1';
+
+        // State: array of 9 booleans and lava counter (0..6)
+        let gridState = new Array(9).fill(false);
+        let lavaCount = 0;
+        let previousLinesCount = 0;
+
+        // Load persisted state
+        function loadState() {
+            try {
+                const savedLava = localStorage.getItem(STORAGE_KEY_LAVA);
+                if (savedLava !== null) {
+                    lavaCount = Math.min(6, Math.max(0, parseInt(savedLava, 10) || 0));
+                }
+
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length === 9) {
+                        gridState = parsed.map(v => Boolean(v));
+                    }
+                }
+
+                if (lavaCount > 0) {
+                    gridState[4] = true;
+                }
+            } catch (e) {
+                console.warn('localStorage fetch failed, using fallback in-memory state', e);
+            }
+        }
+
+        // Save state
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY_LAVA, String(lavaCount));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(gridState));
+            } catch (e) {
+                console.warn('localStorage save failed', e);
+            }
+        }
+
+        // Compute active lines
+        function evaluateLines() {
+            const activeLineIndices = new Set();
+            let lineCount = 0;
+
+            WINNING_LINES.forEach(line => {
+                if (line.every(idx => gridState[idx])) {
+                    lineCount++;
+                    line.forEach(idx => activeLineIndices.add(idx));
+                }
+            });
+
+            return { lineCount, activeLineIndices };
+        }
+
+        // UI Elements
+        const bingoGrid = document.getElementById('bingoGrid');
+        const progressText = document.getElementById('progressText');
+        const progressFill = document.getElementById('progressFill');
+        const bingoCountText = document.getElementById('bingoCountText');
+        const bingoBadge = document.getElementById('bingoBadge');
+        const toastMsg = document.getElementById('toastMsg');
+        const toastText = document.getElementById('toastText');
+        const toastIcon = document.getElementById('toastIcon');
+        const megaModal = document.getElementById('megaModal');
+        const btnCloseModal = document.getElementById('btnCloseModal');
+
+        // Render the 3x3 grid
+        function renderGrid() {
+            bingoGrid.innerHTML = '';
+            const { lineCount, activeLineIndices } = evaluateLines();
+            const regularDone = gridState.filter((v, i) => i !== 4 && v).length;
+            const completedCount = gridState.filter(Boolean).length;
+
+            BINGO_ITEMS.forEach((label, idx) => {
+                const isDone = gridState[idx];
+                const isCenter = (idx === 4);
+                const isInLine = activeLineIndices.has(idx);
+
+                const cell = document.createElement('div');
+                cell.className = 'bingo-cell'
+                    + (isDone ? ' done' : '')
+                    + (isCenter ? ' is-center' : '')
+                    + (isInLine ? ' in-line' : '');
+
+                cell.setAttribute('role', 'gridcell');
+                cell.setAttribute('tabindex', '0');
+                cell.setAttribute('aria-pressed', isDone ? 'true' : 'false');
+                cell.setAttribute('aria-label', `${label} (${isDone ? 'Suoritettu' : 'Ei suoritettu'})`);
+
+                if (isCenter) {
+                    cell.innerHTML = `
+      <span class="cell-text">${escapeHtml(label)}</span>
+      <div class="lava-counter-controls">
+        <button type="button" class="btn-counter btn-minus" aria-label="Vähennä lavaohjelma count" ${lavaCount === 0 ? 'disabled' : ''}>-</button>
+        <span class="lava-count-pill">${lavaCount} / 6</span>
+        <button type="button" class="btn-counter btn-plus" aria-label="Lisää lavaohjelma count" ${lavaCount === 6 ? 'disabled' : ''}>+</button>
+      </div>
+      <span class="cell-check-icon">
+        <svg><use href="#i-check"/></svg>
+      </span>
+    `;
+
+                    const btnPlus = cell.querySelector('.btn-plus');
+                    const btnMinus = cell.querySelector('.btn-minus');
+
+                    btnPlus.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        incrementLavaCount();
+                    });
+
+                    btnMinus.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        decrementLavaCount();
+                    });
+                } else {
+                    cell.innerHTML = `
+      <span class="cell-text">${escapeHtml(label)}</span>
+      <span class="cell-check-icon">
+        <svg><use href="#i-check"/></svg>
+      </span>
+    `;
+                }
+
+                // Click & Keyboard handlers
+                cell.addEventListener('click', () => toggleCell(idx));
+                cell.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleCell(idx);
+                    }
+                });
+
+                bingoGrid.appendChild(cell);
+            });
+
+            // Update Stats & Progress Bar
+            const totalPoints = regularDone + lavaCount + (lineCount * 2);
+            const baseTasksDone = regularDone + lavaCount; // max 14 base points
+            progressText.textContent = `${totalPoints} p`;
+            progressFill.style.width = `${Math.min(100, Math.round((baseTasksDone / 14) * 100))}%`;
+
+            if (lineCount === 0) {
+                bingoCountText.textContent = '0 Bingoa';
+                bingoBadge.classList.remove('has-bingo');
+            } else if (lineCount === 1) {
+                bingoCountText.textContent = '1 Bingo!';
+                bingoBadge.classList.add('has-bingo');
+            } else {
+                bingoCountText.textContent = `${lineCount} Bingoa! 🎉`;
+                bingoBadge.classList.add('has-bingo');
+            }
+        }
+
+        // Increments Lavaohjelma counter
+        function incrementLavaCount() {
+            if (lavaCount >= 6) return;
+            const { lineCount: prevLines } = evaluateLines();
+
+            lavaCount++;
+            if (lavaCount > 0) gridState[4] = true;
+            saveState();
+
+            const { lineCount: newLines } = evaluateLines();
+            const completedCount = gridState.filter(Boolean).length;
+
+            renderGrid();
+
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate([30, 40, 30]);
+            }
+
+            if (lavaCount === 6) {
+                triggerConfettiEffect('reward_6');
+                showToast('🎭 Lavaohjelma 6/6 suoritettu! ✨', '⭐');
+                playCelebrationSound(1, 1);
+            } else if (newLines > prevLines) {
+                playCelebrationSound(newLines, completedCount);
+                if (completedCount === 9) {
+                    triggerConfettiEffect('mega');
+                    showToast('🏆 UPEAA! Täysi 3x3 Bingo suoritettu!', '👑');
+                } else {
+                    triggerConfettiEffect(newLines > 1 ? 'big' : 'standard');
+                    showToast(`🎉 BINGO! ${newLines} riviä valmiina!`, '🥳');
+                }
+            } else {
+                showToast(`Lavaohjelma: ${lavaCount} / 6`, '🎭');
+            }
+        }
+
+        // Decrements Lavaohjelma counter
+        function decrementLavaCount() {
+            if (lavaCount <= 0) return;
+            lavaCount--;
+            if (lavaCount === 0) gridState[4] = false;
+            saveState();
+            renderGrid();
+        }
+
+        // Toggle cell status
+        function toggleCell(idx) {
+            const previousState = [...gridState];
+            const { lineCount: prevLines } = evaluateLines();
+
+            if (idx === 4) {
+                if (!gridState[4]) {
+                    lavaCount = Math.max(1, lavaCount);
+                    gridState[4] = true;
+                } else {
+                    gridState[4] = false;
+                    lavaCount = 0;
+                }
+            } else {
+                gridState[idx] = !gridState[idx];
+            }
+            saveState();
+
+            const { lineCount: newLines } = evaluateLines();
+            const completedCount = gridState.filter(Boolean).length;
+
+            renderGrid();
+
+            // Haptic feedback if available
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(gridState[idx] ? [30, 40, 30] : 20);
+            }
+
+            // Check if a NEW line or full board was achieved
+            if (gridState[idx] && newLines > prevLines) {
+                playCelebrationSound(newLines, completedCount);
+
+                if (completedCount === 9) {
+                    // 🌟 FULL 3x3 BOARD COMPLETED - BIGGEST EFFECT 🌟
+                    triggerConfettiEffect('mega');
+                    showToast('🏆 UPEAA! Täysi 3x3 Bingo suoritettu!', '👑');
+                    setTimeout(() => {
+                        megaModal.classList.add('show');
+                        megaModal.setAttribute('aria-hidden', 'false');
+                    }, 600);
+                } else if (newLines > 1) {
+                    // 🚀 MULTIPLE LINES BINGO - BIGGER EFFECT 🚀
+                    triggerConfettiEffect('big');
+                    showToast(`🚀 MAHTAVAA! Nyt jo ${newLines} Bingo-riviä!`, '✨');
+                } else {
+                    // 🎉 SINGLE LINE BINGO - STANDARD EFFECT 🎉
+                    triggerConfettiEffect('standard');
+                    showToast('🎉 BINGO! Ensimmäinen rivi valmis!', '🥳');
+                }
+            } else if (gridState[idx] && completedCount === 9 && prevLines === newLines) {
+                // Edge case if 9th cell didn't create a new line (already had lines)
+                triggerConfettiEffect('mega');
+                showToast('🏆 KAIKKI 9 TEHTÄVÄÄ VALMIINA!', '⭐');
+            }
+        }
+
+        // Toast notification helper
+        let toastTimeout;
+        function showToast(msg, icon = '🎉') {
+            toastText.textContent = msg;
+            toastIcon.textContent = icon;
+            toastMsg.classList.add('show');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toastMsg.classList.remove('show');
+            }, 3400);
+        }
+
+        btnCloseModal.addEventListener('click', () => {
+            megaModal.classList.remove('show');
+            megaModal.setAttribute('aria-hidden', 'true');
+        });
+
+        // HTML sanitizer helper
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        /* ==========================================================================
+           PURE JS CANVAS CONFETTI & FIREWORKS ENGINE
+           No external dependencies needed - perfect for offline mobile GoodBarber apps!
+           ========================================================================== */
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+        let animId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const BRAND_COLORS = ['#CE5738', '#80884f', '#D39C2F', '#D9744A', '#414a2c', '#ffffff'];
+
+        class Particle {
+            constructor(x, y, vx, vy, color, size, shape = 'rect') {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.color = color;
+                this.size = size;
+                this.shape = shape;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.vRot = (Math.random() - 0.5) * 0.2;
+                this.gravity = 0.15;
+                this.drag = 0.975;
+                this.opacity = 1;
+                this.fade = 0.006 + Math.random() * 0.008;
+            }
+
+            update() {
+                this.vx *= this.drag;
+                this.vy *= this.drag;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.rotation += this.vRot;
+                this.opacity -= this.fade;
+            }
+
+            draw(context) {
+                if (this.opacity <= 0) return;
+                context.save();
+                context.globalAlpha = Math.max(0, this.opacity);
+                context.translate(this.x, this.y);
+                context.rotate(this.rotation);
+                context.fillStyle = this.color;
+
+                if (this.shape === 'circle') {
+                    context.beginPath();
+                    context.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+                    context.fill();
+                } else if (this.shape === 'star') {
+                    context.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        context.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * this.size, -Math.sin((18 + i * 72) * Math.PI / 180) * this.size);
+                        context.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * (this.size / 2), -Math.sin((54 + i * 72) * Math.PI / 180) * (this.size / 2));
+                    }
+                    context.closePath();
+                    context.fill();
+                } else {
+                    context.fillRect(-this.size / 2, -this.size / 2, this.size, this.size * 0.7);
+                }
+
+                context.restore();
+            }
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw(ctx);
+                if (particles[i].opacity <= 0 || particles[i].y > canvas.height + 50) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            if (particles.length > 0) {
+                animId = requestAnimationFrame(animateConfetti);
+            } else {
+                animId = null;
+            }
+        }
+
+        function addBurst(originX, originY, count, speedMax, angleStart, angleEnd) {
+            for (let i = 0; i < count; i++) {
+                const angle = angleStart + Math.random() * (angleEnd - angleStart);
+                const speed = (Math.random() * 0.7 + 0.3) * speedMax;
+                const vx = Math.cos(angle) * speed;
+                const vy = Math.sin(angle) * speed;
+                const color = BRAND_COLORS[Math.floor(Math.random() * BRAND_COLORS.length)];
+                const size = 6 + Math.random() * 8;
+                const shapes = ['rect', 'rect', 'circle', 'star'];
+                const shape = shapes[Math.floor(Math.random() * shapes.length)];
+
+                particles.push(new Particle(originX, originY, vx, vy, color, size, shape));
+            }
+
+            if (!animId) {
+                animId = requestAnimationFrame(animateConfetti);
+            }
+        }
+
+        // Effect Launcher
+        function triggerConfettiEffect(tier) {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            if (tier === 'reward_6') {
+                // Small extra reward confetti for Lavaohjelma 6/6
+                addBurst(w * 0.5, h * 0.55, 70, 14, -Math.PI * 0.85, -Math.PI * 0.15);
+            } else if (tier === 'standard') {
+                // 1 Line: Upward central explosion
+                addBurst(w * 0.5, h * 0.65, 80, 14, -Math.PI * 0.85, -Math.PI * 0.15);
+            } else if (tier === 'big') {
+                // 2+ Lines: Dual bottom corner cannons
+                addBurst(w * 0.15, h * 0.85, 90, 18, -Math.PI * 0.45, -Math.PI * 0.1);
+                addBurst(w * 0.85, h * 0.85, 90, 18, -Math.PI * 0.9, -Math.PI * 0.55);
+            } else if (tier === 'mega') {
+                // Full 3x3 Board: Grand Finale Fireworks Cascade
+                addBurst(w * 0.2, h * 0.8, 120, 20, -Math.PI * 0.45, -Math.PI * 0.05);
+                addBurst(w * 0.8, h * 0.8, 120, 20, -Math.PI * 0.95, -Math.PI * 0.55);
+
+                setTimeout(() => {
+                    addBurst(w * 0.5, h * 0.4, 150, 16, -Math.PI, Math.PI);
+                }, 300);
+
+                setTimeout(() => {
+                    addBurst(w * 0.3, h * 0.5, 100, 15, -Math.PI * 0.8, -Math.PI * 0.2);
+                    addBurst(w * 0.7, h * 0.5, 100, 15, -Math.PI * 0.8, -Math.PI * 0.2);
+                }, 700);
+
+                setTimeout(() => {
+                    addBurst(w * 0.5, h * 0.7, 180, 22, -Math.PI * 0.85, -Math.PI * 0.15);
+                }, 1100);
+            }
+        }
+
+        /* Synthesize gentle celebratory tone via Web Audio API */
+        function playCelebrationSound(lines, count) {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+
+                const notes = count === 9
+                    ? [523.25, 659.25, 783.99, 1046.50] // C5, E5, G5, C6 (Mega victory chord)
+                    : lines > 1
+                        ? [523.25, 659.25, 783.99]         // C5, E5, G5
+                        : [523.25, 659.25];                // C5, E5
+
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+
+                    const startTime = ctx.currentTime + idx * 0.1;
+                    gain.gain.setValueAtTime(0.01, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.18, startTime + 0.04);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.35);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.4);
+                });
+            } catch (e) {
+                // Audio context may be blocked by browser autoplay policy - fail silently
+            }
+        }
+
+        // Initial load & render
+        loadState();
+        renderGrid();
+    </script>
+</body>
+
+</html>

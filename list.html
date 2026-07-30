@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .gb-microapp-root {
+            width: 100%;
+            max-width: none !important;
+            margin-left: 0;
+            margin-right: 0;
+            box-sizing: border-box;
+        }
+    </style>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Jost&family=Nunito:ital,wght@1,900&display=swap">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .gb-microapp-root {
+            width: 100%;
+            max-width: none !important;
+            margin-left: 0;
+            margin-right: 0;
+            box-sizing: border-box;
+        }
+
+        .gb-microapp-root {
+            box-sizing: border-box;
+            width: 100%;
+            min-height: 100%;
+            background: linear-gradient(180deg, #fff 0%, #fbfbfb 100%);
+            color: #101010;
+            font-family: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden
+        }
+
+        .gb-microapp-root *,
+        .gb-microapp-root *::before,
+        .gb-microapp-root *::after {
+            box-sizing: border-box
+        }
+
+        .gb-microapp-root .content-wrapper {
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 16px 16px 28px
+        }
+
+        .gb-microapp-root .hero {
+            padding: 8px 0 16px;
+            animation: fadeIn .35s ease both
+        }
+
+        .gb-microapp-root .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            padding: 0 12px;
+            border-radius: 999px;
+            background: #f4ebe8;
+            color: #ce5738;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .02em;
+            margin-bottom: 12px
+        }
+
+        .gb-microapp-root h1,
+        .gb-microapp-root h2,
+        .gb-microapp-root h3,
+        .gb-microapp-root .category-title strong {
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 900;
+            font-style: italic
+        }
+
+        .gb-microapp-root h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+            line-height: 1.2;
+            color: #101010
+        }
+
+        .gb-microapp-root .subtitle {
+            margin: 0 0 16px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #666
+        }
+
+        .gb-microapp-root .status-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px
+        }
+
+        .gb-microapp-root .progress-meta {
+            font-size: 16px;
+            font-weight: 800;
+            color: #101010
+        }
+
+        .gb-microapp-root .progress-text {
+            font-size: 14px;
+            color: #666;
+            min-height: 20px
+        }
+
+        .gb-microapp-root .progress-track {
+            height: 12px;
+            border-radius: 999px;
+            background: #f1f1f1;
+            overflow: hidden;
+            border: 1px solid #ddd
+        }
+
+        .gb-microapp-root .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #ce5738, #ef8a5f);
+            transition: width .3s linear
+        }
+
+        .gb-microapp-root .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0 12px
+        }
+
+        .gb-microapp-root .action-btn {
+            min-height: 44px;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.2;
+            transition: transform .18s ease, opacity .18s ease, background-color .18s ease, box-shadow .18s ease;
+            color: #101010;
+            background: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .06)
+        }
+
+        .gb-microapp-root .action-btn:active {
+            transform: scale(.98)
+        }
+
+        .gb-microapp-root .action-btn.primary {
+            background: #ce5738;
+            color: #fff;
+            border-color: #ce5738
+        }
+
+        .gb-microapp-root .action-btn.secondary {
+            background: #fff
+        }
+
+        .gb-microapp-root .action-btn.ghost {
+            grid-column: 1/-1;
+            background: #f6f6f6
+        }
+
+        .gb-microapp-root .action-btn.danger {
+            background: #101010;
+            color: #fff;
+            border-color: #101010
+        }
+
+        .gb-microapp-root .chip-host {
+            min-height: 28px;
+            margin: 0 0 12px
+        }
+
+        .gb-microapp-root .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 28px;
+            padding: 0 12px;
+            border-radius: 999px;
+            background: #101010;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700
+        }
+
+        .gb-microapp-root .chip button {
+            border: none;
+            background: transparent;
+            color: #fff;
+            font-size: 18px;
+            line-height: 1;
+            min-width: 24px;
+            min-height: 24px;
+            padding: 0
+        }
+
+        .gb-microapp-root .categories {
+            display: flex;
+            flex-direction: column;
+            gap: 14px
+        }
+
+        .gb-microapp-root .category-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
+            overflow: hidden;
+            animation: cardIn .25s ease both
+        }
+
+        .gb-microapp-root .category-card.featured {
+            border-color: #ce5738;
+            box-shadow: 0 8px 20px rgba(206, 87, 56, .12)
+        }
+
+        .gb-microapp-root .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            width: 100%;
+            min-height: 56px;
+            padding: 16px;
+            border: none;
+            background: transparent;
+            color: #101010;
+            text-align: left
+        }
+
+        .gb-microapp-root .category-title {
+            display: flex;
+            flex-direction: column;
+            gap: 4px
+        }
+
+        .gb-microapp-root .category-title strong {
+            font-size: 17px;
+            line-height: 1.25
+        }
+
+        .gb-microapp-root .category-title span {
+            font-size: 13px;
+            color: #666
+        }
+
+        .gb-microapp-root .chev {
+            width: 24px;
+            height: 24px;
+            flex: 0 0 auto;
+            transition: transform .25s ease-in-out;
+            display: grid;
+            place-items: center;
+            color: #ce5738;
+            font-size: 20px
+        }
+
+        .gb-microapp-root .category-card.open .chev {
+            transform: rotate(180deg)
+        }
+
+        .gb-microapp-root .category-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .28s ease-out;
+            background: #fcfcfc
+        }
+
+        .gb-microapp-root .category-card.open .category-body {
+            max-height: 4000px
+        }
+
+        .gb-microapp-root .items {
+            padding: 0 12px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .gb-microapp-root .item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            min-height: 52px;
+            padding: 12px;
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #eee;
+            transition: background-color .16s ease, transform .16s ease, box-shadow .16s ease
+        }
+
+        .gb-microapp-root .item:active {
+            transform: scale(.995)
+        }
+
+        .gb-microapp-root .item.checked {
+            background: #f8f7f6
+        }
+
+        .gb-microapp-root .check-wrap {
+            flex: 0 0 auto;
+            width: 24px;
+            height: 24px;
+            margin-top: 2px;
+            position: relative
+        }
+
+        .gb-microapp-root .check-wrap input {
+            position: absolute;
+            inset: 0;
+            opacity: 0
+        }
+
+        .gb-microapp-root .check-ui {
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+            border: 2px solid #ce5738;
+            background: #fff;
+            display: grid;
+            place-items: center;
+            transition: transform .16s ease, background-color .16s ease, border-color .16s ease
+        }
+
+        .gb-microapp-root .check-ui::after {
+            content: '';
+            width: 10px;
+            height: 6px;
+            border-left: 3px solid transparent;
+            border-bottom: 3px solid transparent;
+            transform: rotate(-45deg);
+            opacity: 0;
+            transition: opacity .12s ease
+        }
+
+        .gb-microapp-root .check-wrap input:checked+.check-ui {
+            background: #ce5738;
+            border-color: #ce5738;
+            transform: scale(1)
+        }
+
+        .gb-microapp-root .check-wrap input:checked+.check-ui::after {
+            border-color: #fff;
+            opacity: 1
+        }
+
+        .gb-microapp-root .item.checked .check-ui {
+            animation: tick .16s ease
+        }
+
+        .gb-microapp-root .item-main {
+            flex: 1 1 auto;
+            min-width: 0
+        }
+
+        .gb-microapp-root .item-label {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 16px;
+            line-height: 1.45;
+            font-weight: 600;
+            color: #101010
+        }
+
+        .gb-microapp-root .item-note {
+            margin-top: 4px;
+            font-size: 13px;
+            line-height: 1.45;
+            color: #666
+        }
+
+        .gb-microapp-root .info-btn {
+            border: none;
+            background: #f1f1f1;
+            color: #101010;
+            min-width: 36px;
+            min-height: 36px;
+            border-radius: 999px;
+            font-weight: 900;
+            font-size: 14px;
+            align-self: flex-start
+        }
+
+        .gb-microapp-root .notes-card {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, #fff, #fbf7f5);
+            border: 1px solid #ecd7cf
+        }
+
+        .gb-microapp-root .notes-card h2 {
+            margin: 0 0 12px;
+            font-size: 18px;
+            line-height: 1.25;
+            color: #101010
+        }
+
+        .gb-microapp-root .notes-card ul {
+            margin: 0;
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333
+        }
+
+        .gb-microapp-root .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(16, 16, 16, .42);
+            animation: fadeIn .18s ease both;
+            z-index: 20
+        }
+
+        .gb-microapp-root .info-sheet,
+        .gb-microapp-root .confirm-modal {
+            position: fixed;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%) translateY(18px);
+            width: min(100%, 960px);
+            background: #fff;
+            border-radius: 18px 18px 0 0;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, .18);
+            z-index: 21;
+            animation: sheetIn .22s ease both
+        }
+
+        .gb-microapp-root .info-sheet {
+            max-height: 70%;
+            overflow: auto
+        }
+
+        .gb-microapp-root .sheet-handle {
+            width: 44px;
+            height: 5px;
+            border-radius: 999px;
+            background: #ddd;
+            margin: 10px auto 0
+        }
+
+        .gb-microapp-root .sheet-content {
+            padding: 10px 16px 18px
+        }
+
+        .gb-microapp-root .sheet-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px
+        }
+
+        .gb-microapp-root .sheet-top h3,
+        .gb-microapp-root .confirm-modal h3 {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.25
+        }
+
+        .gb-microapp-root .sheet-content p,
+        .gb-microapp-root .confirm-modal p {
+            margin: 12px 0 0;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+            white-space: pre-wrap
+        }
+
+        .gb-microapp-root .icon-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: #f1f1f1;
+            border-radius: 999px;
+            font-size: 28px;
+            line-height: 1;
+            color: #101010
+        }
+
+        .gb-microapp-root .confirm-modal {
+            padding: 16px
+        }
+
+        .gb-microapp-root .confirm-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px
+        }
+
+        .gb-microapp-root .confirm-actions .action-btn {
+            flex: 1
+        }
+
+        .gb-microapp-root [hidden] {
+            display: none !important
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes sheetIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(18px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0)
+            }
+        }
+
+        @keyframes tick {
+            0% {
+                transform: scale(.9)
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        @media (min-width:768px) {
+            .gb-microapp-root .content-wrapper {
+                max-width: 640px;
+                padding: 24px 20px 32px
+            }
+
+            .gb-microapp-root h1 {
+                font-size: 36px
+            }
+
+            .gb-microapp-root .actions {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .gb-microapp-root .action-btn.ghost {
+                grid-column: 1/-1
+            }
+        }
+
+        @media (min-width:1024px) {
+            .gb-microapp-root .content-wrapper {
+                max-width: 720px;
+                padding: 28px 24px 36px
+            }
+
+            .gb-microapp-root .category-title strong {
+                font-size: 18px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="gb-microapp-root">
+        <div class="content-wrapper">
+            <header class="hero">
+                <h1>Osallistujan varustelista</h1>
+                <p class="subtitle">Pakkaa ajoissa. Tarkista varusteet kategoriasta toiseen ja merkitse mukaan ottamasi
+                    tavarat.</p>
+                <div class="status-row">
+                    <div class="progress-meta"><span id="readyCount">0</span><span> / </span><span
+                            id="totalCount">0</span> valmiina</div>
+                    <div id="progressText" class="progress-text">Aloita merkkaamalla ensimmäinen valinta.</div>
+                </div>
+                <div class="progress-track" aria-hidden="true">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+            </header>
+            <section class="actions"><button class="action-btn primary" id="expandAllBtn" type="button">Laajenna
+                    kaikki</button><button class="action-btn secondary" id="collapseAllBtn" type="button">Sulje
+                    kaikki</button><button class="action-btn secondary" id="missingOnlyBtn" type="button">Näytä vain
+                    puutteet</button><button class="action-btn ghost" id="clearAllBtn" type="button">Tyhjennä
+                    valinnat</button></section>
+            <div id="filterChipHost" class="chip-host" aria-live="polite"></div>
+            <main id="categories" class="categories" aria-live="polite"></main>
+            <section class="notes-card">
+                <h2>Muistilista ennen lähtöä</h2>
+                <ul>
+                    <li>Nimikoi kaikki tavarat omalla nimelläsi ja ryhmätiedoilla.</li>
+                    <li>Pakkaa varusteet vesitiiviisti muovipusseihin tai kuivapusseihin.</li>
+                    <li>Ota bussiin vain välttämättömät tavarat ja pidä kädet vapaina rinkan siirtoon.</li>
+                    <li>Varaudu kantamaan omat varusteesi noin kilometrin matka leirialueella.</li>
+                </ul>
+            </section>
+        </div>
+        <div id="modalBackdrop" class="modal-backdrop" hidden></div>
+        <div id="infoSheet" class="info-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+            <div class="sheet-handle"></div>
+            <div class="sheet-content">
+                <div class="sheet-top">
+                    <h3 id="sheetTitle"></h3><button id="closeSheetBtn" class="icon-btn" type="button"
+                        aria-label="Sulje">×</button>
+                </div>
+                <p id="sheetBody"></p>
+            </div>
+        </div>
+        <div id="confirmBackdrop" class="modal-backdrop" hidden></div>
+        <div id="confirmModal" class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle"
+            hidden>
+            <h3 id="confirmTitle">Poistetaanko kaikki merkinnät?</h3>
+            <p>Poistetaanko kaikki merkinnät?</p>
+            <div class="confirm-actions"><button id="cancelClearBtn" class="action-btn secondary"
+                    type="button">Peruuta</button><button id="confirmClearBtn" class="action-btn danger"
+                    type="button">Tyhjennä</button></div>
+        </div>
+    </div>
+
+    <script>
+        window.GB_PLUGIN_ID = "d4fe1c8e-89cc-445a-a5f9-ad1a5c003b66";
+        var APP_STORAGE_KEY = 'ilves26_equipments_checklist_v1';
+        var checklistData = [
+            {
+                category: 'Partiovarusteet', featured: true, summary: '3 kohtaa', note: 'Peruspartiovarusteet', items: [
+                    { id: 'scarf', label: 'Partiohuivi' },
+                    { id: 'uniform', label: 'Partioasu' },
+                    { id: 'membercard', label: 'Jäsenkortti', note: 'Tulostettuna tai puhelimeen ladattuna Kuksasta.' }
+                ]
+            },
+            {
+                category: 'Vaatteet ja asusteet', summary: '18 kohtaa', note: 'Varautuminen säähän', items: [
+                    { id: 'hat', label: 'Auringolta suojaava päähine', note: 'Esim. lippis tai huivi.' }, { id: 'beanie', label: 'Pipo', note: 'Illat ja yöt voivat olla viileitä.' }, { id: 'gloves', label: 'Käsineet' }, { id: 'windjacket', label: 'Tuulenpitävä takki' }, { id: 'pants1', label: 'Kahdet pitkät housut' }, { id: 'warmtop', label: 'Villapaita tai muu lämmin pitkähihainen päällyspaita' }, { id: 'underwear', label: 'Alusvaatteita' }, { id: 'baselayer', label: 'Pitkä aluskerrasto' }, { id: 'socks', label: 'Sukkia' }, { id: 'woolsocks', label: 'Villasukat' }, { id: 'shorts', label: 'Shortseja' }, { id: 'teeshirts', label: 'T-paitoja' }, { id: 'shoes', label: 'Hyvät kävelykengät', note: 'Esim. lenkkarit.' }, { id: 'boots', label: 'Kumisaappaat' }, { id: 'rainset', label: 'Sadetakki ja -housut', note: 'Ei kertakäyttösadetakkeja.' }, { id: 'swimwear', label: 'Uima-asu' }, { id: 'sandals', label: 'Sandaalit tai vastaavat suihkussa käyntiin' }
+                ]
+            },
+            {
+                category: 'Yöpymisvarusteet', summary: '6 kohtaa', note: 'Lämpöä ja unta varten', items: [
+                    { id: 'sleepingbag', label: 'Makuupussi', note: 'Kesälläkin voi olla viileää.' }, { id: 'linner', label: 'Makuupussin sisäpussi', note: 'Halutessasi lisälämpöä varten.' }, { id: 'mat', label: 'Makuualusta' }, { id: 'pyjama', label: 'Yöasu' }, { id: 'pillow', label: 'Tyyny', note: 'Halutessasi.' }, { id: 'softtoy', label: 'Unilelu', note: 'Halutessasi.' }
+                ]
+            },
+            {
+                category: 'Ruokailuvälineet', summary: '7 kohtaa', note: 'Särkymättömät astiat', items: [
+                    { id: 'plate1', label: '2 lautasta', note: 'Vähintään yksi syvä lautanen.' }, { id: 'mug', label: 'Muki', note: 'Vähintään 2 dl.' }, { id: 'cutlery', label: 'Ruokalusikka, haarukka ja veitsi' }, { id: 'bottle', label: 'Juomapullo', note: 'Vähintään 1 l.' }, { id: 'towel', label: 'Kankainen astiapyyhe' }, { id: 'foodbag', label: 'Ripustettava kangaspussi ruokailuvälineille' }, { id: 'note_hot', label: 'Huomio', note: 'Metalliset välineet ovat pienille leiriläisille haastavia tiskata kuuman veden takia.' }
+                ]
+            },
+            {
+                category: 'Retkeilyvälineet', summary: '8 kohtaa', note: 'Liikkumiseen ja ohjelmalaaksoihin', items: [
+                    { id: 'backpack', label: 'Rinkka tai muu selässä kannettava laukku' }, { id: 'daypack', label: 'Pienempi päiväreppu' }, { id: 'raincover', label: 'Sadesuoja rinkalle ja pikkurepulle' }, { id: 'knife', label: 'Puukko nimellä varustettuna', note: 'Kerätään talteen leirin ajaksi.' }, { id: 'flashlight', label: 'Otsa- tai taskulamppu' }, { id: 'batteries', label: 'Varaparistot lampulle' }, { id: 'powerbank', label: 'Varavirtalähde ja latausjohto', note: 'Halutessasi.' }, { id: 'seatpad', label: 'Istuinalusta' }
+                ]
+            },
+            {
+                category: 'Peseytymisvälineet ja hygienia', summary: '18 kohtaa', note: 'Pehmeä, käytännöllinen hygieniakokonaisuus', items: [
+                    { id: 'towel_big', label: 'Iso pyyhe' }, { id: 'towel_small', label: 'Pieni pyyhe' }, { id: 'benchcloth', label: 'Kestävä laudeliina', note: 'Ei kertakäyttöinen.' }, { id: 'washbag', label: 'Kankainen pesupussi' }, { id: 'toothbrush', label: 'Hammasharja' }, { id: 'toothpaste', label: 'Hammastahna' }, { id: 'soap', label: 'Nestesaippua', note: 'Biohajoava.' }, { id: 'shampoo', label: 'Shampoo', note: 'Biohajoava.' }, { id: 'hairbrush', label: 'Kampa tai hiusharja' }, { id: 'hairties', label: 'Pompuloita, pinnejä yms.', note: 'Halutessasi.' }, { id: 'deo', label: 'Deodorantti' }, { id: 'handgel', label: 'Käsidesi' }, { id: 'sunscreen', label: 'Aurinkorasva' }, { id: 'tissues', label: 'Nenäliinoja' }, { id: 'lipbalm', label: 'Huulirasva' }, { id: 'mosquito', label: 'Hyttysmyrkky' }, { id: 'glasses', label: 'Silmälasit', note: 'Säilytyskotelo mukaan, piilolinssit eivät sovellu leiriolosuhteisiin.' }, { id: 'basemint', label: 'Perusvoide' }, { id: 'bandages', label: 'Laastareita ja rakkolaastareita' }, { id: 'supportbandage', label: 'Ideaaliside / tukiside' }, { id: 'period', label: 'Kuukautissuojia', note: 'Jos saatat tarvita leirin aikana.' }, { id: 'toiletpaper', label: 'Vessapaperirulla' }, { id: 'wetwipes', label: 'Kosteuspyyhkeet', note: 'Suosi biohajoavia tuotteita.' }
+                ]
+            },
+            {
+                category: 'Henkilökohtaiset lääkkeet', summary: '7 kohtaa', note: 'Pakkaa huolella ja vesitiiviisti', items: [
+                    { id: 'kela', label: 'Kela-kortti ja mahdollinen vakuutuskortti' }, { id: 'painkillers', label: 'Itsellesi sopivat kipulääkkeet' }, { id: 'allergy', label: 'Allergialääkkeitä', note: 'Jos olet niitä joskus tarvinnut.' }, { id: 'itchcream', label: 'Voide itikoiden pistojen kutinaan' }, { id: 'regularmeds', label: 'Säännöllisesti tarvitsemasi lääkkeet' }, { id: 'emergencymeds', label: 'Tarvittaessa käyttämäsi lääkkeet', note: 'Esim. Epipen/Jext, avaava astmalääke, glukagoni.' }, { id: 'othermeds', label: 'Muut lääkkeet, joita saatat tarvita' }
+                ]
+            },
+            {
+                category: 'Yleistavarat', summary: '11 kohtaa', note: 'Arjen perusjutut leirille', items: [
+                    { id: 'watch', label: 'Rannekello' }, { id: 'payment', label: 'Maksukortti tai rahaa corego-rannekkeelle' }, { id: 'no_cash', label: 'Huomio', note: 'Leirillä ei ole käteismaksumahdollisuutta.' }, { id: 'notebook', label: 'Pieni vihko' }, { id: 'markers', label: 'Ohut spriitussi ja lyijykynä', note: 'Vesitiiviissä pussissa.' }, { id: 'dirtylaundry', label: 'Pusseja likaisille vaatteille' }, { id: 'workgloves', label: 'Työhanskat', note: 'Seikkailijat, tarpojat, samoajat, vaeltajat ja aikuiset halutessasi.' }, { id: 'reading', label: 'Lukemista', note: 'Halutessasi.' }, { id: 'cards', label: 'Pelikortit' }, { id: 'earplugs', label: 'Korvatulpat' }, { id: 'sleepmask', label: 'Unimaski / silmälaput' }, { id: 'camera', label: 'Kamera' }, { id: 'sunglasses', label: 'Aurinkolasit' }
+                ]
+            },
+            {
+                category: 'Valinnaiset lisätavarat', summary: '8 kohtaa', note: 'Mukaan vain jos itselle sopii', items: [
+                    { id: 'camera2', label: 'Kamera' }, { id: 'sunglasses2', label: 'Aurinkolasit' }, { id: 'cards2', label: 'Pelikortit' }, { id: 'earplugs2', label: 'Korvatulpat' }, { id: 'sleepmask2', label: 'Unimaski' }, { id: 'book2', label: 'Lukemista' }, { id: 'sewing', label: 'Pieni korjaussetti' }, { id: 'extra_bag', label: 'Lisäpussi pienille tavaroille' }
+                ]
+            },
+            {
+                category: 'Ohjelmaan tarvittavat varusteet, sudenpennut', summary: '6 kohtaa', note: 'Ikäryhmäkohtainen osio', items: [
+                    { id: 'white_shirt_cubs', label: 'Valkoinen t-paita', note: 'Värjätään ohjelmassa.' }, { id: 'woolsocks_cubs', label: '1 pari villasukkia', note: 'Uusi käyttötarkoitus nikkarilaaksossa.' }, { id: 'compass_cubs', label: 'Kompassi', note: 'Jos omistat.' }, { id: 'disco_cubs', label: 'Diskovaatteet', note: 'Jos haluat.' }, { id: 'phone_camera_cubs', label: 'Kamera', note: 'Riittää, että esimerkiksi saattajalla on kamerallinen älypuhelin.' }, { id: 'extra_cubs', label: 'Muut mahdolliset ohjelmatarpeet', note: 'Tarpeen mukaan.' }
+                ]
+            },
+            {
+                category: 'Ohjelmaan tarvittavat varusteet, seikkailijat', summary: '5 kohtaa', note: 'Ikäryhmäkohtainen osio', items: [
+                    { id: 'white_shirt_adv', label: 'Valkoinen t-paita', note: 'Värjätään ohjelmassa.' }, { id: 'woolsocks_adv', label: '1 pari villasukkia', note: 'Uusi käyttötarkoitus nikkarilaaksossa.' }, { id: 'camera_adv', label: 'Kamera', note: 'Riittää, että yhdellä vartiosta on kamerallinen älypuhelin.' }, { id: 'compass_adv', label: 'Kompassi', note: 'Jos omistat.' }, { id: 'disco_adv', label: 'Diskovaatteet', note: 'Jos haluat.' }
+                ]
+            },
+            {
+                category: 'Ohjelmaan tarvittavat varusteet, tarpojat', summary: '5 kohtaa', note: 'Ikäryhmäkohtainen osio', items: [
+                    { id: 'white_shirt_tar', label: 'Valkoinen t-paita', note: 'Värjätään ohjelmassa.' }, { id: 'camera_tar', label: 'Kamera', note: 'Riittää, että yhdellä vartiosta on kamerallinen älypuhelin.' }, { id: 'compass_tar', label: 'Kompassi', note: 'Jos omistat.' }, { id: 'disco_tar', label: 'Diskovaatteet', note: 'Jos haluat.' }, { id: 'ea_tar', label: 'Pienet henkilökohtaiset EA-välineet' }
+                ]
+            },
+            {
+                category: 'Ohjelmaan tarvittavat varusteet, samoajat', summary: '4 kohtaa', note: 'Ikäryhmäkohtainen osio', items: [
+                    { id: 'disco_sam', label: 'Diskovaatteet', note: 'Teemabileet: retro, Suomituristi ja reivit.' }, { id: 'compass_sam', label: 'Kompassi', note: 'Jos omistat.' }, { id: 'ea_sam', label: 'Pienet henkilökohtaiset EA-välineet' }, { id: 'theme_sam', label: 'Teemabileisiin sopiva asu', note: 'Halutessasi.' }
+                ]
+            },
+            {
+                category: 'Ohjelmaan tarvittavat varusteet, vaeltajat ja aikuiset', summary: '3 kohtaa', note: 'Ikäryhmäkohtainen osio', items: [
+                    { id: 'disco_adult', label: 'Diskovaatteet', note: 'Teemabileisiin.' }, { id: 'compass_adult', label: 'Kompassi', note: 'Jos omistat.' }, { id: 'theme_adult', label: 'Teemabileisiin sopiva asu', note: 'Halutessasi.' }
+                ]
+            },
+            {
+                category: 'Saavutettavuus', summary: '6 kohtaa', note: 'Tarvittaessa mukaan', items: [
+                    { id: 'extension', label: 'Vähintään 20 m jatkojohto', note: 'Jos olet pyytänyt terveyssähköä telttaan.' }, { id: 'aiddevice', label: 'Omat apuvälineet ja varaosat', note: 'Mukana myös paristot tai varavirtalähde, jos tarpeen.' }, { id: 'sunflower', label: 'Auringonkukkanauha tai -merkki', note: 'Tarvittaessa näkymättömän rajoitteen tueksi.' }, { id: 'communication', label: 'Kuvakommunikaatiokortit ja -kansiot', note: 'Sekä kuulosuojaimet ja muut pienapuvälineet.' }, { id: 'prints', label: 'Tulosteet Ilves26.fi/moninaisuus-sivulta', note: 'Tarpeen mukaan.' }, { id: 'swim_aids', label: 'Uimisen apuvälineet' }
+                ]
+            },
+            {
+                category: 'Alle kouluikäiset osallistujat', summary: '12 kohtaa', note: 'Perhekylä tai alaleiri', items: [
+                    { id: 'diapers', label: 'Tarvittaessa kertakäyttövaipat', note: 'Kestovaippoja ei hygieniasyistä käytetä.' }, { id: 'tray', label: 'Tarjotin ruokailuihin', note: 'Helpottaa omien ruokien kantamista.' }, { id: 'highchair', label: 'Syöttötuoli', note: 'Tarvittaessa.' }, { id: 'potty', label: 'Oma potta', note: 'Perhekylässä on yksi yhteiskäyttöön.' }, { id: 'babywipes', label: 'Baby wipesit', note: 'Biohajoavat tuotteet suositeltavia.' }, { id: 'comforttoy', label: 'Oma unikaveri', note: 'Tarvittaessa.' }, { id: 'toys', label: 'Muut tärkeät lelut', note: 'Muista nimikoida.' }, { id: 'yardgame', label: 'Pihapeli yhteiseen käyttöön', note: 'Muista nimikoida.' }, { id: 'book', label: 'Kirja yhteiseen kirjastoon', note: 'Leiriolosuhteet huomioiden.' }, { id: 'bucket', label: 'Omat ämpärit ja lapiot', note: 'Hiekkalaatikolle.' }, { id: 'bucket10', label: '10 l ämpäri vesileikkeihin', note: 'Hellepäiviä varten.' }, { id: 'stroller', label: 'Kuljetusväline lapselle tai tavaroille', note: 'Esim. vetokärry tai maastoon sopivat rattaat.' }
+                ]
+            }
+        ];
+        var savedState = { checked: {}, open: {}, filterMissingOnly: false };
+        var storageReady = false;
+        var isRendering = false;
+        var activeSheetType = '';
+        var lastFocusElement = null;
+        function getAllItemsCount() { var c = 0; for (var i = 0; i < checklistData.length; i++) c += checklistData[i].items.length; return c; }
+        function getCheckedCount() { var n = 0; for (var k in savedState.checked) if (savedState.checked[k]) n++; return n; }
+        function persistState() { if (!window.gb || !gb.pluginStorage) return; gb.pluginStorage.setItem(APP_STORAGE_KEY, JSON.stringify(savedState)); }
+        function loadStateFromStorage() { if (!window.gb || !gb.pluginStorage) { renderApp(); return; } gb.pluginStorage.getItem(APP_STORAGE_KEY, function (value) { try { if (value) savedState = JSON.parse(value) || savedState; } catch (e) { savedState = { checked: {}, open: {}, filterMissingOnly: false }; showStorageError(); } storageReady = true; renderApp(); }); }
+        function showStorageError() { var pt = document.getElementById('progressText'); if (pt) pt.textContent = 'Tallennettu tila ei ollut luettavissa. Voit jatkaa ilman tallennusta.'; }
+        function renderApp() {
+            if (isRendering) return; isRendering = true; var categoriesEl = document.getElementById('categories'); if (!categoriesEl) { isRendering = false; return; } var total = getAllItemsCount(); var checked = getCheckedCount(); var pct = total ? Math.round((checked / total) * 100) : 0; document.getElementById('readyCount').textContent = String(checked); document.getElementById('totalCount').textContent = String(total); document.getElementById('progressFill').style.width = pct + '%'; document.getElementById('progressText').textContent = checked === 0 ? 'Aloita merkkaamalla ensimmäinen valinta.' : (checked === total ? 'Kaikki tärkeät varusteet merkitty — pakkaus on hyvässä vauhdissa!' : 'Keskeneräisiä kohtia on vielä jäljellä.'); var host = document.getElementById('filterChipHost'); host.innerHTML = ''; if (savedState.filterMissingOnly) { var chip = document.createElement('div'); chip.className = 'chip'; chip.innerHTML = '<span>Näytetään vain puutteet</span><button type="button" id="clearFilterBtn" aria-label="Poista suodatin">×</button>'; host.appendChild(chip); } categoriesEl.innerHTML = ''; for (var i = 0; i < checklistData.length; i++) {
+                var cat = checklistData[i]; var visibleItems = []; for (var j = 0; j < cat.items.length; j++) { var item = cat.items[j]; var checkedNow = !!savedState.checked[item.id]; if (!savedState.filterMissingOnly || !checkedNow) visibleItems.push(item); } if (savedState.filterMissingOnly && visibleItems.length === 0) continue; var card = document.createElement('section'); card.className = 'category-card' + (savedState.open[cat.category] ? ' open' : '') + (cat.featured ? ' featured' : ''); card.style.animationDelay = (i * 0.08) + 's'; var catChecked = 0; for (var m = 0; m < cat.items.length; m++) if (savedState.checked[cat.items[m].id]) catChecked++; var header = document.createElement('button'); header.type = 'button'; header.className = 'category-header'; header.setAttribute('aria-expanded', savedState.open[cat.category] ? 'true' : 'false'); header.setAttribute('data-category', cat.category); header.innerHTML = '<div class="category-title"><strong>' + escapeHtml(cat.category) + '</strong><span>' + catChecked + '/' + cat.items.length + ' merkitty</span></div><div class="chev">⌄</div>'; var body = document.createElement('div'); body.className = 'category-body'; var itemsHtml = '<div class="items">'; for (var n = 0; n < cat.items.length; n++) { var it = cat.items[n]; var isChecked = !!savedState.checked[it.id]; if (savedState.filterMissingOnly && isChecked) continue; itemsHtml += '<label class="item' + (isChecked ? ' checked' : '') + '" data-item="' + it.id + '"><span class="check-wrap"><input type="checkbox" data-id="' + it.id + '" ' + (isChecked ? 'checked' : '') + ' aria-label="' + escapeAttr(it.label + ', ' + (isChecked ? 'valittu' : 'ei valittu')) + '"><span class="check-ui"></span></span><span class="item-main"><span class="item-label"><span>' + escapeHtml(it.label) + '</span></span>' + (it.note ? '<div class="item-note">' + escapeHtml(it.note) + '</div>' : '') + '</span><button class="info-btn" type="button" data-info="' + escapeAttr(it.label + '\n' + (it.note || '')) + '" aria-label="Lisätiedot">i</button></label>'; }
+                itemsHtml += '</div>'; body.innerHTML = itemsHtml; card.appendChild(header); card.appendChild(body); categoriesEl.appendChild(card);
+            }
+            bindEvents(); updateFilterChip(); updateEmptyState(); isRendering = false;
+        }
+        function updateFilterChip() { var host = document.getElementById('filterChipHost'); if (!host) return; if (savedState.filterMissingOnly) host.style.minHeight = '28px'; }
+        function updateEmptyState() { var categoriesEl = document.getElementById('categories'); if (!categoriesEl) return; if (savedState.filterMissingOnly) { var hasVisible = categoriesEl.querySelector('.category-card'); if (!hasVisible) { categoriesEl.innerHTML = '<section class="category-card open"><div class="category-header"><div class="category-title"><strong>Ei puutteita tässä näkymässä.</strong><span>Kaikki kohdat on merkitty. Hienoa!</span></div><div class="chev">⌄</div></div><div class="category-body" style="max-height: none;"><div class="items"><div class="item"><div class="item-main"><div class="item-label"><span>Kaikki kohdat on merkitty. Hienoa!</span></div><div class="item-note">Voit poistaa suodatuksen tai tarkistaa vielä toisen kategorian.</div></div></div></div></div></section>'; } } }
+        function bindEvents() { var categoriesEl = document.getElementById('categories'); categoriesEl.querySelectorAll('.category-header').forEach(function (btn) { btn.addEventListener('click', handleToggleCategory); }); categoriesEl.querySelectorAll('input[type="checkbox"]').forEach(function (cb) { cb.addEventListener('change', handleCheckboxChange); }); categoriesEl.querySelectorAll('.info-btn').forEach(function (btn) { btn.addEventListener('click', handleInfoClick); }); var f = document.getElementById('clearFilterBtn'); if (f) f.addEventListener('click', clearFilter); var expand = document.getElementById('expandAllBtn'); var collapse = document.getElementById('collapseAllBtn'); var missing = document.getElementById('missingOnlyBtn'); var clear = document.getElementById('clearAllBtn'); if (expand) expand.addEventListener('click', expandAll); if (collapse) collapse.addEventListener('click', collapseAll); if (missing) missing.addEventListener('click', toggleMissingOnly); if (clear) clear.addEventListener('click', requestClearAll); var ccb = document.getElementById('cancelClearBtn'); var conf = document.getElementById('confirmClearBtn'); var close = document.getElementById('closeSheetBtn'); var backdrop = document.getElementById('modalBackdrop'); var cback = document.getElementById('confirmBackdrop'); if (ccb) ccb.addEventListener('click', closeConfirm); if (conf) conf.addEventListener('click', confirmClearAll); if (close) close.addEventListener('click', closeSheet); if (backdrop) backdrop.addEventListener('click', closeSheet); if (cback) cback.addEventListener('click', closeConfirm); }
+        function handleToggleCategory(e) { var cat = e.currentTarget.getAttribute('data-category'); savedState.open[cat] = !savedState.open[cat]; persistState(); renderApp(); }
+        function handleCheckboxChange(e) { var id = e.target.getAttribute('data-id'); savedState.checked[id] = e.target.checked; persistState(); tryHaptic(); renderApp(); }
+        function handleInfoClick(e) { lastFocusElement = e.currentTarget; activeSheetType = e.currentTarget.getAttribute('data-info'); openSheet(activeSheetType); }
+        function openSheet(text) { document.getElementById('sheetTitle').textContent = 'Lisätiedot'; document.getElementById('sheetBody').textContent = text; document.getElementById('modalBackdrop').hidden = false; document.getElementById('infoSheet').hidden = false; }
+        function closeSheet() { document.getElementById('modalBackdrop').hidden = true; document.getElementById('infoSheet').hidden = true; if (lastFocusElement && lastFocusElement.focus) lastFocusElement.focus(); }
+        function expandAll() { for (var i = 0; i < checklistData.length; i++) savedState.open[checklistData[i].category] = true; persistState(); renderApp(); }
+        function collapseAll() { for (var i = 0; i < checklistData.length; i++) savedState.open[checklistData[i].category] = false; persistState(); renderApp(); }
+        function toggleMissingOnly() { savedState.filterMissingOnly = !savedState.filterMissingOnly; persistState(); renderApp(); }
+        function clearFilter() { savedState.filterMissingOnly = false; persistState(); renderApp(); }
+        function requestClearAll() { document.getElementById('confirmBackdrop').hidden = false; document.getElementById('confirmModal').hidden = false; }
+        function closeConfirm() { document.getElementById('confirmBackdrop').hidden = true; document.getElementById('confirmModal').hidden = true; }
+        function confirmClearAll() { savedState.checked = {}; persistState(); closeConfirm(); renderApp(); }
+        function tryHaptic() { if (navigator && navigator.vibrate) navigator.vibrate(10); }
+        function escapeHtml(str) { return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;'); }
+        function escapeAttr(str) { return escapeHtml(str).replace(/'/g, '&#39;'); }
+        gb.onappear = function () { loadStateFromStorage(); };
+        ; (function () {
+            if (window.__gbOnAppearWatchdog) { return; }
+            window.__gbOnAppearWatchdog = true;
+            if (typeof window.gb === "undefined" || typeof gb.onappear !== "function") { return; }
+            var original = gb.onappear;
+            var fired = false;
+            gb.onappear = function () { fired = true; return original.apply(this, arguments); };
+            setTimeout(function () {
+                if (!fired) { try { gb.onappear(); } catch (e) { } }
+            }, 1200);
+        })();
+    </script>
+</body>
+
+</html>

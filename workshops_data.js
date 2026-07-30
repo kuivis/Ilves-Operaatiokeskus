@@ -1,0 +1,434 @@
+const WORKSHOPS_DATA = [
+  {
+    "id": "wp_2",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "4 askelta oman elämän hallintaan",
+    "location": "Johtajakahvilan lava",
+    "capacity": "ei rajattu",
+    "description": "Nämä neljä askelta muodostavat elinikäisen harjoituksen, jonka avulla sinusta tulee sellainen ihminen, joka pysyy tasapainossa, kun muut ajautuvat pelon, vimman tai hämmennyksen valtaan. Ne eivät ole tekniikoita, vaan muodonmuutoksia – tapoja määrittää asemasi kuolevaisuutta, vastuuta, merkitystä ja nöyryyttä kohtaan. Hitaasti omaksuttuina ja päivä kerrallaan elettyinä ne kehittävät mieltä. Mieltä, joka pysyy selkeänä ja kirkkaana paineen alla, sekä sydäntä, joka pysyy avoimena jännityksen tai paineen alla.\nTyöpajan pitää Tapsa Kankkonen, Messukylän Metsäpojat lpkj",
+    "signup": "Ei"
+  },
+  {
+    "id": "wp_3",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Demos-demokratiadialogit",
+    "location": "Kaverilaakso",
+    "capacity": "20",
+    "description": "Tervetuloa keskustelemaan DEMOS – dialogiin, jossa jokaisen ääni on yhtä tärkeä! Keskustelun tarkoituksena on oppia toisiltamme ja kuunnella jokaisen osallistujan näkökulmia sekä kokemuksia aiheesta. Erätaukosäätiön kehittämissä DEMOS - dialogeissa jaetaan omia kokemuksia ja keskustellaan mm. ilmastonmuutoksesta, mielen hyvinvoinnista ja johtajuudesta.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_4",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Hae leiripestistäsi Osaamismerkki!",
+    "location": "Johtajahuolto, samoajien teltta",
+    "capacity": "ei rajattu",
+    "description": "Haluatko hakea osaamismerkkiä, mutta et tiedä mistä aloittaa? Tule mukaan työpajaan, jossa käymme hakuprosessin läpi vaihe vaiheelta. Saat käytännön vinkkejä, ohjausta hakemuksen tekemiseen ja apua omien taitojesi sanoittamiseen.\nTyöpajaa pitää Petri Isoluoma, SP:n Osaamisryhmän puheenjohtaja",
+    "signup": "Ei"
+  },
+  {
+    "id": "wp_5",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Huoltovarmuus – mitä se on, ja voiko sitä syödä?",
+    "location": "Raffun katos",
+    "capacity": "ei rajattu",
+    "description": "Onko varautuminen maailmanlopun meininkiä vai partiolaisen perustaito? Mitä minun pitäisi tietää yksilön, yhteisön ja yhteiskunnan huoltovarmuudesta?  Miten partio-ohjelma huomioi huoltovarmuuden?\nMiten hyödynnän ja kasvatan taitojani?\nAiheesta puhuu Katleena ”Skeitti” Kortesuo, joka kouluttaa huoltovarmuutta sekä töissä että vapaaehtoistehtävissä.",
+    "signup": "Ei"
+  },
+  {
+    "id": "wp_6",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Ice Tea cafe [ais tii cafe]",
+    "location": "Moninaisuuden piste leirisuoralla",
+    "capacity": "50",
+    "description": "Tervetuloa aistikahvioon, missä pääset kokemaan, minkälaista on nauttia jääteetä ja mutakakkua, jos kaikki aistit tai raajat eivät toimikaan niin kuin olet tottunut.\nOma muki, lautanen ja lusikka mukaan! Voit myös ottaa retkituolin varalta, jos haluat.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_7",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Johtajuus on joukkuepeli",
+    "location": "katospaikka 6",
+    "capacity": "20",
+    "description": "Partiossa johtajana olo ei tarkoita yksinpurjehdusta eikä johtajan ei tarvitse osata kaikkea itse. Tule keskustelemaan parhaista ideoista ja saamaan vinkkejä delegoinnista.\nPajan pitäjänä partiojohtaja Antto Hautamäki.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_8",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Just Dance Ilves Summer Hits",
+    "location": "Torilava",
+    "capacity": "ei rajattu",
+    "description": "Tervetuloa nauttimaan hyvästä musiikista täysin rinnoin! Luvassa on suomimusiikin suurimpia hittejä, joiden tahdissa pääsemme yhdessä ystävien kanssa tanssimaan ja laulamaan. Ilves26 elämysjohtajat esittelevät parhaat muuvit, joiden tahdissa pääsemme liikkumaan. Tärkeintä on, että jokainen poistuu paikalta hikisenä ja hymyssä suin!\nMitä biisejä on luvassa?\nv: Kaikkea hittiputken ja Robinin tuotannon väliltä\nTarvitseeko osata tanssia tai laulaa?\nv: Tämä ei ole tanssitunti. Yhdessä liikkuminen ja hauskanpito on keskiössä!\nPitääkö paikalle saapua ystävän kanssa?\nv: Saat saapua paikalle joko itseksesi tai isomman kaveriporukan kanssa. Helpot koreografiat soveltuvat sekä yhden ihmisen että kaveriporukan tanssittavaksi.\nMitä tarvitsen mukaan?\nv: Vesipullon\nTanssittajina Ilves26 elämysjohtajat Pihla Suhonen ja Janna Rantamaa",
+    "signup": "Ei"
+  },
+  {
+    "id": "wp_9",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Kolvaus ja veistely",
+    "location": "Nikkarilaakso",
+    "capacity": "20",
+    "description": "Tule nikkarilaaksoon rauhoittumaan käsitöiden äärelle ja tekemään itsellesi viimeisen muiston Ilves-leiristä.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_10",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Lippukunnan vastuullisuus",
+    "location": "Vastuullisuuden Pop-Up teltta leiriaukiolla Niityn vieressä",
+    "capacity": "20",
+    "description": "Mikä on Kestävästi Partiossa -tunnus, miten sitä haetaan ja miten sitä ylläpidetään? Mikä on hiilijalanjälki, talla ja vuola? Tule keskustelemaan, jakamaan oman lippukunnan käytäntöjä ja oppimaan muilta!",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_11",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Luotsilta luotsille – samoaja- ja vaeltajaluotsien vertaisoppimishetki",
+    "location": "katospaikka 7",
+    "capacity": "20",
+    "description": "Tule jakamaan kokemuksia ja löytämään uusia näkökulmia luotsina toimimiseen. Vertaismentorointisessiossa keskustellaan samoaja- ja vaeltajatoiminnan onnistumisista, haasteista ja käytännön tilanteista yhdessä muiden luotsien kanssa. Keskustelua ohjataan kevyesti, mutta sisältö rakentuu osallistujien omista kokemuksista ja kysymyksistä. Tavoitteena on oppia toisilta, saada uusia ideoita omaan pestiin ja vahvistaa luotsien välistä verkostoa.\nTyöpajan vetäjänä toimii Olli Koskela, tarpoja-, samoaja- ja vaeltajaluotsi (Jaakon Samoojat), Ilves26 talouspäällikkö sekä Elina Laine, tarpoja-, samoaja- ja vaeltajaluotsi (Jaakon Samoojat)",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_12",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Luottamusrata",
+    "location": "Kaverilaakso",
+    "capacity": "20",
+    "description": "Luottamusradalla harjoitellaan toisen ohjaamista ja toiseen luottamista turvallisessa ympäristössä. Radoista löytyy erilaisia vaihtoehtoja helposta hieman vaikeampiin. Haastetta lisää se, että rata kuljetaan silmät sidottuna toisen antaessa suullisia ohjeita.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_13",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Millaista on nepsy-ystävällinen partio?",
+    "location": "katospaikka 3",
+    "capacity": "20",
+    "description": "Työpajassa käydään keskustelua siitä, miten partio voi olla nepsyille toimiva tai haastava harrastus ja miten nepsyyttä voidaan ottaa huomioon partiossa niin leireillä kuin viikkotoiminnassakin. Pohdimme millaisia muutoksia partioarkeen voi tehdä, jotta siitä tulisi helpompaa nepsyille. Osallistujat pääsevät myös näkemään, miten pienillä asioilla yhteisestä tilasta voidaan tehdä nepsy-ystävällisempi.\nTyöpajan pitää Tifta Jokitie, vaeltaja",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_14",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Minä ja metsä",
+    "location": "Luontolaakso",
+    "capacity": "20",
+    "description": "Millaisena haluat jättää luonnonympäristön tuleville sukupolville? Keskustellaan ja askarrellaan paperille hahmotelmia tulevaisuuden hyvinvoivasta luonnonympäristöstä.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_15",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Miten johdat projektia, kun tiimi koostuu vertaisista ja vapaaehtoisista?",
+    "location": "iso sauna",
+    "capacity": "40",
+    "description": "Tämä paja on tarkoitettu erityisesti samoajille ja vaeltajille.\nTule keskustelemaan löylyjen lomassa projektijohtamisen käytännön haasteista ja ratkaisuista. Keskustelemme vertaisprojektien johtamisesta, vapaaehtoisten sitouttamisesta ja motivoinnista, onnistuneesta viestinnästä, riskienhallinnasta sekä projektin talouden seurannasta. Työpaja tarjoaa osallistujille mahdollisuuden jakaa kokemuksia, oppia toisiltaan ja löytää uusia näkökulmia projektien onnistuneeseen johtamiseen.\nTyöpaja pidetään isolla saunalla, ota saunakamppeet mukaan. Löylyttäjinä Ilves26 leirinjohtajat Jenni Pöllänen ja Petteri Lavikko.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_16",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Mitä tekisin seuraavaksi partiossa?",
+    "location": "Koulutuksen kohtauspaikka leirisuoralla",
+    "capacity": "20",
+    "description": "Kaipaatko jotain uutta partiopolullesi, mutta et tiedä mitä? Kaipaatko uusia haasteita tai itsesi kehittämistä? Vai etsitkö tällä kertaa jotain kevyempää tekemistä itsellesi? Tule pohtimaan omia mahdollisuuksiasi ja kuulemaan uusia ideoita Koulutuksen Kohtauspaikalle.\nTyöpajan pitävät Niina Raevaara, SP:n koulutusohjaajaverkoston puheenjohtaja ja Maaret Liljaniemi, vapaaehtoistuesta vastaava SP:n hallituksen jäsen",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_17",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Mitä valmentaminen on partiossa?",
+    "location": "Alueteltta leirisuoralla",
+    "capacity": "ei rajattu",
+    "description": "Haluatko tukea partiopestiisi tai uutta suuntaa partiopolullesi? Tiedätkö mitä eroa on mentoroinnilla ja valmentamisella? Kaipaatko uutta piiripestiä tai ideoita ja vinkkejä johtajahuoltoon?",
+    "signup": "Ei"
+  },
+  {
+    "id": "wp_18",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Monikulttuurinen kohtaaminen",
+    "location": "katospaikka 8",
+    "capacity": "20",
+    "description": "Kuka minä olen ja mistä minä tulen - tule keskustelemaan monikulttuurisesta kohtaamisesta. Tästä pajasta saat eväitä monikulttuuriseen kohtaamiseen erilaisissa tilanteissa.\nPajan pitää Maija Vuorinen, Ilves26 turvallisuuspäällikkö",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_19",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Ramborata",
+    "location": "Sepeli&KITT – alue",
+    "capacity": "20",
+    "description": "Haasta itsesi ramboradalla ja tule kisailemaan muita vastaan radan nopeimmasta ajasta!",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_20",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Sukellus leirilääkinnän ja paloturvallisuuden saloihin",
+    "location": "pääportti",
+    "capacity": "20",
+    "description": "Tiedätkö mitä kaikkea Ilveksen kokoisella leirillä tarvitaan pelastus- ja lääkintätoimintaan? Oletko harkinnut pelastus- tai lääkintäalan ammattia?\nTule tutustumaan leirin palo- ja pelastustoimintaan sekä lääkintään ja terveyskeskukseen.\nLeirin palo- ja pelastusmestari Noora Koivisto sekä lääkintämestari Saara Markkanen tutustuttavat palokunnan, pelastushenkilöstön ja leiriterveyskeskuksen toimintaan.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_21",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Sukupuoli- ja seksuaalivähemmistöt partiossa",
+    "location": "katospaikka 2",
+    "capacity": "20",
+    "description": "Koulutuksessa perehdytään käytännönläheisesti sukupuoli- ja seksuaalivähemmistöjen näkökulmaan partio-ohjelmaan ja -toimintaan. Miten moninaisuus näkyy partiossa, miten sen huomiointia voisi tai tulisi kehittää?\nPajan pitää Laurenzia Mäntysalo.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_22",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Tekoäly pestisi tukena",
+    "location": "katospaikka 1",
+    "capacity": "20",
+    "description": "Retkikirje, iltaohjelmaideat, kokouksen valmistelu, viesti huoltajille – moni johtajan rutiinitehtävä hoituu tekoälyn avulla nopeammin, kunhan tietää miten sitä käskytetään ja mitä sille saa kertoa. Tässä workshopissa tutustutaan siihen, millaisia tekoälytyökaluja partiojohtajalle on tarjolla, mitä SP:n tuoreet turvallisuusohjeet (2026) sanovat tekoälyn käytöstä. Workshopissa tehdään\ntoiminnallisia ryhmätehtäviä, joissa opit hyvän promptin rakentamisen ja tekoälyn tuotosten kriittisen arvioinnin (yritetään suoriutua ilman tästä metsäolosuhteissa :) Ei vaadi ennakko-osaamista.\nTyöpajan pitää Sami “Kuivis” Kuivasaari, Ilves26 nettimestari",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_23",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Uusi strategia on tulossa, miten hyödynnän sitä partioarjessani?",
+    "location": "katospaikka 4",
+    "capacity": "20",
+    "description": "Suomen partiolaisten uusi strategia vahvistetaan jäsenkokouksessa marraskuussa. Uusi strategia luo karttaa meille partiolaisille seuraavalle kuudelle vuodelle. Tule työpajaan keskustelemaan siitä, miten voit hyödyntää uutta strategiaa omassa partioarjessasi.\nPajaa vetää Suomen Partiolaisten 1. vpj Jenna Kankaanpää.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_24",
+    "timeslot": "Työpaja 1: klo 14:30–15:30",
+    "title": "Yhteistyöllä parasta tulosta",
+    "location": "katospaikka 5",
+    "capacity": "20",
+    "description": "Tässä työpajassa pohditaan projektin ja lippukunnanjohdon näkökulmista, että miten voi johtaa erilaisia osaajia partiossa. Miten löytää sopivia pestejä eri taitajille ja rohkaista jokaista loistamaan omassa pestissään. Työpajassa pohditaan myös miten eri ikäiset ja -taustaiset partiolaiset voisi saada toimimaan hyvin yhdessä.\nTyöpajan pitää Sini Stolt, Ilves26 ohjelmajohtaja",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_25",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "4 askelta oman elämän hallintaan",
+    "location": "Katospaikka 1",
+    "capacity": "20",
+    "description": "Nämä neljä askelta muodostavat elinikäisen harjoituksen, jonka avulla sinusta tulee sellainen ihminen, joka pysyy tasapainossa, kun muut ajautuvat pelon, vimman tai hämmennyksen valtaan. Ne eivät ole tekniikoita, vaan muodonmuutoksia – tapoja määrittää asemasi kuolevaisuutta, vastuuta, merkitystä ja nöyryyttä kohtaan. Hitaasti omaksuttuina ja päivä kerrallaan elettyinä ne kehittävät mieltä. Mieltä, joka pysyy selkeänä ja kirkkaana paineen alla, sekä sydäntä, joka pysyy avoimena jännityksen tai paineen alla.\nTyöpajan pitää Tapsa Kankkonen, Messukylän Metsäpojat lpkj",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_26",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Demos-demokratiadialogit",
+    "location": "Kaverilaakso",
+    "capacity": "20",
+    "description": "Tervetuloa keskustelemaan DEMOS – dialogiin, jossa jokaisen ääni on yhtä tärkeä! Keskustelun tarkoituksena on oppia toisiltamme ja kuunnella jokaisen osallistujan näkökulmia sekä kokemuksia aiheesta. Erätaukosäätiön kehittämissä DEMOS - dialogeissa jaetaan omia kokemuksia ja keskustellaan mm. ilmastonmuutoksesta, mielen hyvinvoinnista ja johtajuudesta.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_27",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Hae leiripestistäsi Osaamismerkki!",
+    "location": "Johtajahuolto, samoajien teltta",
+    "capacity": "ei rajattu",
+    "description": "Haluatko hakea osaamismerkkiä, mutta et tiedä mistä aloittaa? Tule mukaan työpajaan, jossa käymme hakuprosessin läpi vaihe vaiheelta. Saat käytännön vinkkejä, ohjausta hakemuksen tekemiseen ja apua omien taitojesi sanoittamiseen.\nTyöpajaa pitää Petri Isoluoma, SP:n Osaamisryhmän puheenjohtaja",
+    "signup": "Ei"
+  },
+  {
+    "id": "wp_28",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Ice Tea cafe [ais tii cafe]",
+    "location": "Moninaisuuden piste leirisuoralla",
+    "capacity": "50",
+    "description": "Tervetuloa aistikahvioon, missä pääset kokemaan, minkälaista on nauttia jääteetä ja mutakakkua, jos kaikki aistit tai raajat eivät toimikaan niin kuin olet tottunut.\nOma muki, lautanen ja lusikka mukaan! Voit myös ottaa retkituolin varalta, jos haluat.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_29",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Jaksamisen johtaminen",
+    "location": "katospaikka 5",
+    "capacity": "20",
+    "description": "Tässä työpajassa pohditaan yhdessä, miten johtaa pesteissä jaksamista projekteissa ja lippukunnissa. Innostuksen tason vaihtelu kuuluu sekä pesteihin että projekteihin. Miten johtaa omaa ja toisten jaksamista, jotta ei uuvu omiin partiopesteihinsä, vaan saa niistä iloa sekä jaksamista. Pohditaan mikä itseä motivoi ja miten voisi auttaa muita löytämään motivaatiota, ehkä jopa uudelleen.\nPajan pitää Ilves26 ohjelmajohtaja Sini Stolt.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_30",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Johtajuus on joukkuepeli",
+    "location": "katospaikka 6",
+    "capacity": "20",
+    "description": "Partiossa johtajana olo ei tarkoita yksinpurjehdusta eikä johtajan ei tarvitse osata kaikkea itse. Tule keskustelemaan parhaista ideoista ja saamaan vinkkejä delegoinnista.\nPajan pitäjänä partiojohtaja Antto Hautamäki.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_31",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Jokajohtajan kriisiviestintä – viisi parasta vinkkiä",
+    "location": "katospaikka 4",
+    "capacity": "20",
+    "description": "Miten kriisi syntyy? Mikä on johtajan rooli kriisin aikana? Kriisiä ei voi hoitaa ilman viestintää. Mitä tehdä, kun kriisi perkelöityy.\nTyöpajan vetää Katleena ”Skeitti” Kortesuo, joka on kouluttanut kriisiviestintää yli kymmenen vuotta pörssiyhtiöissä, kunnissa ja kaupungeissa.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_32",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Just Dance Ilves Summer Hits",
+    "location": "Torilava",
+    "capacity": "ei rajattu",
+    "description": "Tervetuloa nauttimaan hyvästä musiikista täysin rinnoin! Luvassa on suomimusiikin suurimpia hittejä, joiden tahdissa pääsemme yhdessä ystävien kanssa tanssimaan ja laulamaan. Ilves26 elämysjohtajat esittelevät parhaat muuvit, joiden tahdissa pääsemme liikkumaan. Tärkeintä on, että jokainen poistuu paikalta hikisenä ja hymyssä suin!\nMitä biisejä on luvassa?\nv: Kaikkea hittiputken ja Robinin tuotannon väliltä\nTarvitseeko osata tanssia tai laulaa?\nv: Tämä ei ole tanssitunti. Yhdessä liikkuminen ja hauskanpito on keskiössä!\nPitääkö paikalle saapua ystävän kanssa?\nv: Saat saapua paikalle joko itseksesi tai isomman kaveriporukan kanssa. Helpot koreografiat soveltuvat sekä yhden ihmisen että kaveriporukan tanssittavaksi.\nMitä tarvitsen mukaan?\nv: Vesipullon\nTanssittajina Ilves26 elämysjohtajat Pihla Suhonen ja Janna Rantamaa",
+    "signup": "Ei"
+  },
+  {
+    "id": "wp_33",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Kolvaus ja veistely",
+    "location": "Nikkarilaakso",
+    "capacity": "20",
+    "description": "Tule nikkarilaaksoon rauhoittumaan käsitöiden äärelle ja tekemään itsellesi viimeisen muiston Ilves-leiristä.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_34",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Luotsilta luotsille – samoaja- ja vaeltajaluotsien vertaisoppimishetki",
+    "location": "katospaikka 7",
+    "capacity": "20",
+    "description": "Tule jakamaan kokemuksia ja löytämään uusia näkökulmia luotsina toimimiseen. Vertaismentorointisessiossa keskustellaan samoaja- ja vaeltajatoiminnan onnistumisista, haasteista ja käytännön tilanteista yhdessä muiden luotsien kanssa. Keskustelua ohjataan kevyesti, mutta sisältö rakentuu osallistujien omista kokemuksista ja kysymyksistä. Tavoitteena on oppia toisilta, saada uusia ideoita omaan pestiin ja vahvistaa luotsien välistä verkostoa.\nTyöpajan vetäjänä toimii Olli Koskela, tarpoja-, samoaja- ja vaeltajaluotsi (Jaakon Samoojat), Ilves26 talouspäällikkö sekä Elina Laine, tarpoja-, samoaja- ja vaeltajaluotsi (Jaakon Samoojat)",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_35",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Luottamusrata",
+    "location": "Kaverilaakso",
+    "capacity": "20",
+    "description": "Luottamusradalla harjoitellaan toisen ohjaamista ja toiseen luottamista turvallisessa ympäristössä. Radoista löytyy erilaisia vaihtoehtoja helposta hieman vaikeampiin. Haastetta lisää se, että rata kuljetaan silmät sidottuna toisen antaessa suullisia ohjeita.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_36",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Millaista on nepsy-ystävällinen partio?",
+    "location": "katospaikka 3",
+    "capacity": "20",
+    "description": "Työpajassa käydään keskustelua siitä, miten partio voi olla nepsyille toimiva tai haastava harrastus ja miten nepsyyttä voidaan ottaa huomioon partiossa niin leireillä kuin viikkotoiminnassakin. Pohdimme millaisia muutoksia partioarkeen voi tehdä, jotta siitä tulisi helpompaa nepsyille. Osallistujat pääsevät myös näkemään, miten pienillä asioilla yhteisestä tilasta voidaan tehdä nepsy-ystävällisempi.\nTyöpajan pitää Tifta Jokitie, vaeltaja",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_37",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Minä ja metsä",
+    "location": "Luontolaakso",
+    "capacity": "20",
+    "description": "Millaisena haluat jättää luonnonympäristön tuleville sukupolville? Keskustellaan ja askarrellaan paperille hahmotelmia tulevaisuuden hyvinvoivasta luonnonympäristöstä.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_38",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Miten johdat projektia, kun tiimi koostuu vertaisista ja vapaaehtoisista?",
+    "location": "iso sauna",
+    "capacity": "40",
+    "description": "Tämä paja on tarkoitettu erityisesti samoajille ja vaeltajille.\nTule keskustelemaan löylyjen lomassa projektijohtamisen käytännön haasteista ja ratkaisuista. Keskustelemme vertaisprojektien johtamisesta, vapaaehtoisten sitouttamisesta ja motivoinnista, onnistuneesta viestinnästä, riskienhallinnasta sekä projektin talouden seurannasta. Työpaja tarjoaa osallistujille mahdollisuuden jakaa kokemuksia, oppia toisiltaan ja löytää uusia näkökulmia projektien onnistuneeseen johtamiseen.\nTyöpaja pidetään isolla saunalla, ota saunakamppeet mukaan. Löylyttäjinä Ilves26 leirinjohtajat Jenni Pöllänen ja Petteri Lavikko.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_39",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Mitä tekisin seuraavaksi partiossa?",
+    "location": "Koulutuksen kohtauspaikka leirisuoralla",
+    "capacity": "20",
+    "description": "Kaipaatko jotain uutta partiopolullesi, mutta et tiedä mitä? Kaipaatko uusia haasteita tai itsesi kehittämistä? Vai etsitkö tällä kertaa jotain kevyempää tekemistä itsellesi? Tule pohtimaan omia mahdollisuuksiasi ja kuulemaan uusia ideoita Koulutuksen Kohtauspaikalle.\nTyöpajan pitävät Niina Raevaara, SP:n koulutusohjaajaverkoston puheenjohtaja ja Maaret Liljaniemi, vapaaehtoistuesta vastaava SP:n hallituksen jäsen",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_40",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Mitä valmentaminen on partiossa?",
+    "location": "Alueteltta leirisuoralla",
+    "capacity": "ei rajattu",
+    "description": "Haluatko tukea partiopestiisi tai uutta suuntaa partiopolullesi? Tiedätkö mitä eroa on mentoroinnilla ja valmentamisella? Kaipaatko uutta piiripestiä tai ideoita ja vinkkejä johtajahuoltoon?",
+    "signup": "Ei"
+  },
+  {
+    "id": "wp_41",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Ramborata",
+    "location": "Sepeli&KITT – alue",
+    "capacity": "20",
+    "description": "Haasta itsesi ramboradalla ja tule kisailemaan muita vastaan radan nopeimmasta ajasta!",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_42",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Sukellus leirilääkinnän ja paloturvallisuuden saloihin",
+    "location": "pääportti",
+    "capacity": "20",
+    "description": "Tiedätkö mitä kaikkea Ilveksen kokoisella leirillä tarvitaan pelastus- ja lääkintätoimintaan? Oletko harkinnut pelastus- tai lääkintäalan ammattia?\nTule tutustumaan leirin palo- ja pelastustoimintaan sekä lääkintään ja terveyskeskukseen.\nLeirin palo- ja pelastusmestari Noora Koivisto sekä lääkintämestari Saara Markkanen tutustuttavat palokunnan, pelastushenkilöstön ja leiriterveyskeskuksen toimintaan.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_43",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Sukupuoli- ja seksuaalivähemmistöt partiossa",
+    "location": "katospaikka 2",
+    "capacity": "20",
+    "description": "Koulutuksessa perehdytään käytännönläheisesti sukupuoli- ja seksuaalivähemmistöjen näkökulmaan partio-ohjelmaan ja -toimintaan. Miten moninaisuus näkyy partiossa, miten sen huomiointia voisi tai tulisi kehittää?\nPajan pitää Laurenzia Mäntysalo.",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_44",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Tekoäly ja partion arvot",
+    "location": "Johtajakahvilan lava",
+    "capacity": "ei rajattu",
+    "description": "Tekoäly on jo partiossa, mutta miten sen käyttö sopii yhteen partion arvojen kanssa? Tässä workshopissa ei tuijoteta ruutuja vaan keskustellaan: Mitä tekoälyllä voi ja kannattaa tehdä partiossa, ja mihin sitä ei ehkä tulisi käyttää? Mitä tapahtuu itse tekemisen kulttuurille, jos kone tekee leirilogot ja retkikirjeet? Entä miten tekoälyn energian- ja vedenkulutus istuu partion ympäristötavoitteisiin? Pohdimme yhdessä, missä kulkee partiomaisen tekoälyn käytön raja. Puhutaan myös SP:n ohjeistuksista tekoälyn käyttöön. Et tarvitse aiempaa kokemusta tekoälystä – riittää, että sinulla on mielipide tai halu muodostaa sellainen. Sopii kaikille johtajille pesteistä riippumatta.\nTyöpajan pitää Sami “Kuivis” Kuivasaari, Ilves26 nettimestari",
+    "signup": "Ei"
+  },
+  {
+    "id": "wp_45",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Traumatietoinen kohtaaminen",
+    "location": "katospaikka 8",
+    "capacity": "20",
+    "description": "Mietitään yhdessä, millaisin tavoin voisimme olla traumatietoisempia partiossa ja kuinka voisimme ottaa traumatietoisuuden osaksi partiotoimintaa.\nPajan pitää Maija Vuorinen, Ilves26 turvallisuuspäällikkö",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_46",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Uusi partion strategia",
+    "location": "Raffun katos",
+    "capacity": "ei rajattu",
+    "description": "Suomen partiolaisten uutta strategiaa on valmisteltu keväästä 2025 ja se hyväksytään jäsenkokouksessa syksyllä 2026. Nyt sinulla on erinomainen mahdollisuus päästä kuulemaan uuden strategian kärjet ja jalkauttamisen suunnitelmat. Ehkä vaihdetaan muutama sana myös siitä, miten strategian valmisteluprosessi on edennyt ja minkälaista vaikuttavuutta uudelta strategialta odotetaan.\nStrategiaa on esittelemässä Suomen partiolaisten 1. vpj Jenna Kankaanpää.",
+    "signup": "Ei"
+  },
+  {
+    "id": "wp_47",
+    "timeslot": "Työpaja 2: klo 17:30–18:30",
+    "title": "Vastuullisuuden kahvituokio",
+    "location": "Vastuullisuuden Pop-Up teltta leiriaukiolla Niityn vieressä",
+    "capacity": "20",
+    "description": "(oma kahvi mukaan)\nMiltä näyttää partio vuonna 2050? Mikä vastuullisuudessa on turhaa näpertelyä ja mikä oikeasti vaikuttaa? Vapaata keskustelua siitä mitä partiossa tehdään vastuullisuuden saralla hyvin ja mitä pitäisi vielä tehdä?",
+    "signup": "Kyllä"
+  },
+  {
+    "id": "wp_48",
+    "timeslot": "Non-stop: klo 14:30–18:30",
+    "title": "Samoajien osaamispolku (Kaikki samoajat osallistuvat)",
+    "location": "lähtöpaikka Nikkarilaakson portin ja johtajakahvilan välissä",
+    "capacity": "ei rajattu",
+    "description": "Tiedätkö, mikä on osaamismerkki ja mitä hyötyä sinulle siitä voi olla? Miten voit yhdistää opinnot ja partiopestin? Osaatko kertoa partiossa hankkimastasi osaamisesta vaikkapa kesätyöhakemuksessa?\nOsaamispolulla tutustut partion osaamistyökaluihin. Polun päätteeksi saat Merkkihenkilö-pinssin huiviisi! Sen mukana kulkee paljon tietoa, josta voi olla sinulle tulevaisuudessa suurta hyötyä.\nJos haluat osallistua muihin työpajoihin, osaamispolun pikaversion voi käydä läpi myöhemmin saman päivän aikana Johtajahuollon samoajateltalla.",
+    "signup": "Ei"
+  },
+  {
+    "id": "wp_49",
+    "timeslot": "Non-stop: klo 14:30–18:30",
+    "title": "Vaeltajien ja aikuisten osaamispolku",
+    "location": "lähtö Koulutuksen kohtauspaikan teltta leirisuoralla",
+    "capacity": "ei rajattu",
+    "description": "Tiedätkö, mikä on osaamismerkki ja mitä hyötyä sinulle siitä voi olla? Miten voit yhdistää opinnot ja partiopestin? Osaatko kertoa partiossa hankkimastasi osaamisesta vaikkapa työhakemuksessa? Miten tuet ryhmääsi osaamisen sanoittamisessa?\nOsaamispolulla tutustut partion osaamistyökaluihin. Polun päätteeksi saat Merkkihenkilö-pinssin huiviisi! Sen mukana kulkee paljon tietoa, josta voi olla sinulle tulevaisuudessa suurta hyötyä.",
+    "signup": "Ei"
+  }
+];
