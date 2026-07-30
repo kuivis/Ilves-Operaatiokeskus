@@ -132,6 +132,68 @@ main{
   82%{opacity:1; transform:translate(-50%,0) scale(1)}
   100%{opacity:0; transform:translate(-50%,-14px) scale(1)}}
 
+/* ===== Lemmings 100% räjähdysefekti ===== */
+@keyframes lemmingsVibrate {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); filter: drop-shadow(0 0 8px rgba(206, 87, 56, 0.4)); }
+  10% { transform: translate(-3px, 2px) rotate(-1.5deg) scale(1.02); filter: drop-shadow(0 0 14px rgba(206, 87, 56, 0.7)); }
+  20% { transform: translate(3px, -2px) rotate(1.5deg) scale(0.98); }
+  30% { transform: translate(-4px, -1px) rotate(-2deg) scale(1.03); filter: drop-shadow(0 0 20px rgba(211, 156, 47, 0.95)); }
+  40% { transform: translate(4px, 3px) rotate(2deg) scale(0.97); }
+  50% { transform: translate(-5px, 1px) rotate(-2.5deg) scale(1.04); filter: drop-shadow(0 0 26px rgba(206, 87, 56, 0.95)); }
+  60% { transform: translate(5px, -3px) rotate(2.5deg) scale(0.96); }
+  70% { transform: translate(-6px, 2px) rotate(-3deg) scale(1.05); filter: drop-shadow(0 0 32px #fff); }
+  80% { transform: translate(6px, -2px) rotate(3deg) scale(0.95); }
+  90% { transform: translate(-7px, 3px) rotate(-3.5deg) scale(1.06); filter: drop-shadow(0 0 40px #fff); }
+  100% { transform: translate(7px, -3px) rotate(3.5deg) scale(1.08); filter: drop-shadow(0 0 50px #fff); }
+}
+
+.lemmings-shaking {
+  animation: lemmingsVibrate 0.1s infinite alternate !important;
+  position: relative !important;
+  z-index: 50 !important;
+  border-color: var(--punainen) !important;
+  box-shadow: 0 0 30px rgba(206, 87, 56, 0.9), inset 0 0 20px rgba(211, 156, 47, 0.8) !important;
+}
+
+.lemmings-ohno-tag {
+  position: absolute;
+  top: -2.3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--punainen);
+  color: #fff;
+  font-family: var(--head);
+  font-weight: 900;
+  font-size: 1.15rem;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  border: 2px solid var(--kulta);
+  box-shadow: 0 0 15px rgba(206, 87, 56, 0.9);
+  animation: ohNoPulse 0.25s infinite alternate;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 60;
+}
+
+@keyframes ohNoPulse {
+  from { transform: translateX(-50%) scale(1) rotate(-1deg); }
+  to { transform: translateX(-50%) scale(1.22) rotate(2deg); }
+}
+
+.lemmings-exploded {
+  opacity: 0 !important;
+  transform: scale(0.001) !important;
+  pointer-events: none !important;
+  transition: opacity 0.15s ease, transform 0.15s ease !important;
+}
+
+.lemmings-returning {
+  opacity: 1 !important;
+  transform: scale(1) translate(0, 0) !important;
+  transition: opacity 1.5s cubic-bezier(0.34, 1.56, 0.64, 1), transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
 /* ===== Tiketit-popup: statusryhmät ===== */
 .bkt{margin-bottom:1.1rem}
 .bkt-h{display:flex; align-items:center; gap:.5rem; margin-bottom:.6rem}
@@ -537,7 +599,14 @@ function tickTimer(){
   document.getElementById('tPct').textContent = shown + ' %';
   // juhli aina kun leiri etenee kokonaisen prosentin
   if (lastPct === null) lastPct = shown;
-  else if (shown > lastPct){ lastPct = shown; if (shown > 0 && shown <= 100) celebrate(shown); }
+  else if (shown > lastPct){
+    lastPct = shown;
+    if (shown > 0 && shown < 100) celebrate(shown);
+    else if (shown >= 100 && !lemmings100Triggered){
+      lemmings100Triggered = true;
+      startLemmingsExplosion();
+    }
+  }
 }
 
 /* ============ SÄÄ (Ilmatieteen laitos, WFS) ============ */
@@ -1166,6 +1235,59 @@ function confettiTick(){
         cctx.restore();
         nextConfetti.push(p);
       }
+    } else if (p.type === 'pixel_spark'){
+      p.vx *= 0.97; p.vy *= 0.97; p.vy += p.gravity;
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.alpha -= p.decay;
+      if (p.alpha > 0){
+        cctx.save();
+        cctx.globalAlpha = Math.max(0, p.alpha);
+        cctx.translate(p.x, p.y);
+        cctx.rotate(p.rot);
+        cctx.fillStyle = p.color;
+        cctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+        cctx.restore();
+        nextConfetti.push(p);
+      }
+    } else if (p.type === 'smoke_puff'){
+      p.vx *= 0.94; p.vy *= 0.94; p.x += p.vx; p.y += p.vy;
+      p.r += p.growth; p.alpha -= p.decay;
+      if (p.alpha > 0){
+        cctx.save();
+        cctx.globalAlpha = Math.max(0, p.alpha);
+        cctx.fillStyle = p.color;
+        cctx.beginPath();
+        cctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        cctx.fill();
+        cctx.restore();
+        nextConfetti.push(p);
+      }
+    } else if (p.type === 'shockwave'){
+      p.r += p.speed; p.alpha -= p.decay;
+      if (p.alpha > 0){
+        cctx.save();
+        cctx.globalAlpha = Math.max(0, p.alpha);
+        cctx.strokeStyle = p.color;
+        cctx.lineWidth = p.lineWidth || 4;
+        cctx.beginPath();
+        cctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        cctx.stroke();
+        cctx.restore();
+        nextConfetti.push(p);
+      }
+    } else if (p.type === 'pop_text'){
+      p.y += p.vy; p.alpha -= p.decay;
+      if (p.alpha > 0){
+        cctx.save();
+        cctx.globalAlpha = Math.max(0, p.alpha);
+        cctx.font = '900 ' + p.fontSize + 'px Nunito, sans-serif';
+        cctx.fillStyle = p.color;
+        cctx.textAlign = 'center';
+        cctx.shadowColor = '#000';
+        cctx.shadowBlur = 8;
+        cctx.fillText(p.text, p.x, p.y);
+        cctx.restore();
+        nextConfetti.push(p);
+      }
     } else {
       p.vy += 0.09; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vx *= 0.99;
       if (p.y < confettiCanvas.height + 40){
@@ -1194,11 +1316,225 @@ function showCelebrateToast(pct){
   showCelebrateToastText(`🎉 Leiri <b>${pct} %</b> takana!`, 4200);
 }
 
-/* Keyboard shortcut: "I" / "i" triggers the 30s fireworks easter egg */
+/* ============ RETRO LEMMINGS 100% RÄJÄHDYSEFEKTI ============ */
+let audioCtx = null;
+function getAudioCtx(){
+  if (!audioCtx){
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) audioCtx = new AudioContext();
+  }
+  if (audioCtx && audioCtx.state === 'suspended'){
+    audioCtx.resume().catch(() => {});
+  }
+  return audioCtx;
+}
+
+function playRetroRumble(durationMs = 3000){
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    const now = ctx.currentTime;
+    osc.frequency.setValueAtTime(40, now);
+    osc.frequency.exponentialRampToValueAtTime(140, now + durationMs / 1000);
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.linearRampToValueAtTime(0.2, now + durationMs / 1000 - 0.2);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + durationMs / 1000);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + durationMs / 1000);
+  } catch (e) {}
+}
+
+function playRetroExplosionSound(){
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime;
+    const bufferSize = Math.floor(ctx.sampleRate * 0.55);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+    const whiteNoise = ctx.createBufferSource();
+    whiteNoise.buffer = buffer;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(800, now);
+    filter.frequency.exponentialRampToValueAtTime(30, now + 0.5);
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.35, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+    whiteNoise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    whiteNoise.start(now);
+    whiteNoise.stop(now + 0.5);
+
+    const subOsc = ctx.createOscillator();
+    const subGain = ctx.createGain();
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(150, now);
+    subOsc.frequency.exponentialRampToValueAtTime(25, now + 0.35);
+    subGain.gain.setValueAtTime(0.45, now);
+    subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    subOsc.connect(subGain);
+    subGain.connect(ctx.destination);
+    subOsc.start(now);
+    subOsc.stop(now + 0.35);
+  } catch (e) {}
+}
+
+function explodeCardParticles(rect){
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const colors = ['#CE5738', '#D9744A', '#D39C2F', '#80884f', '#414a2c', '#ffffff', '#FFAE40', '#ff4d4d'];
+
+  confetti.push({ type: 'shockwave', x: cx, y: cy, r: 10, speed: 18, alpha: 1, decay: 0.035, color: '#D39C2F', lineWidth: 6 });
+  confetti.push({ type: 'shockwave', x: cx, y: cy, r: 5, speed: 12, alpha: 1, decay: 0.025, color: '#CE5738', lineWidth: 4 });
+
+  const sparkCount = 280;
+  for (let i = 0; i < sparkCount; i++) {
+    const rx = rect.left + Math.random() * rect.width;
+    const ry = rect.top + Math.random() * rect.height;
+    const angle = Math.atan2(ry - cy, rx - cx) + (Math.random() - 0.5) * 0.5;
+    const speed = 4 + Math.random() * 22;
+    confetti.push({
+      type: 'pixel_spark',
+      x: rx,
+      y: ry,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 2,
+      gravity: 0.28,
+      size: 5 + Math.random() * 10,
+      rot: Math.random() * 6.28,
+      vr: (Math.random() - 0.5) * 0.4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: 1,
+      decay: 0.012 + Math.random() * 0.018
+    });
+  }
+
+  for (let i = 0; i < 24; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = Math.random() * Math.min(rect.width, rect.height) * 0.4;
+    confetti.push({
+      type: 'smoke_puff',
+      x: cx + Math.cos(angle) * dist,
+      y: cy + Math.sin(angle) * dist,
+      vx: (Math.random() - 0.5) * 4,
+      vy: (Math.random() - 0.5) * 4 - 1.5,
+      r: 15 + Math.random() * 20,
+      growth: 1.2 + Math.random() * 1.5,
+      color: Math.random() < 0.5 ? 'rgba(206,87,56,0.35)' : 'rgba(211,156,47,0.35)',
+      alpha: 0.8,
+      decay: 0.018 + Math.random() * 0.015
+    });
+  }
+
+  const texts = ['BOOM!', 'OH NO!', '💥 POP!', '100%!'];
+  const text = texts[Math.floor(Math.random() * texts.length)];
+  confetti.push({
+    type: 'pop_text',
+    x: cx,
+    y: cy,
+    vy: -2.5,
+    fontSize: 34 + Math.floor(Math.random() * 14),
+    color: '#D39C2F',
+    text: text,
+    alpha: 1,
+    decay: 0.015
+  });
+
+  if (!confettiRAF) confettiRAF = requestAnimationFrame(confettiTick);
+}
+
+let lemmingsExploding = false;
+let lemmings100Triggered = false;
+
+function startLemmingsExplosion(){
+  if (lemmingsExploding) return;
+  lemmingsExploding = true;
+  getAudioCtx();
+
+  const cards = Array.from(document.querySelectorAll('main .card'));
+  if (!cards.length) {
+    lemmingsExploding = false;
+    return;
+  }
+
+  showCelebrateToastText('💣 LEMMINGS ARMAGEDDON INITIATED! 100 % 💣', 60000);
+
+  const totalCards = cards.length;
+  const vibrationDuration = 3000;
+  const explosionPhaseTotal = 40000;
+  const interval = totalCards > 1 ? (explosionPhaseTotal - vibrationDuration) / (totalCards - 1) : 0;
+
+  cards.forEach((card, index) => {
+    const vibrateTime = index * interval;
+    const explodeTime = vibrateTime + vibrationDuration;
+
+    setTimeout(() => {
+      card.classList.add('lemmings-shaking');
+      const tag = document.createElement('div');
+      tag.className = 'lemmings-ohno-tag';
+      tag.textContent = index % 2 === 0 ? 'OH NO!' : '3... 2... 1... BOOM!';
+      card.appendChild(tag);
+      playRetroRumble(vibrationDuration);
+    }, vibrateTime);
+
+    setTimeout(() => {
+      const rect = card.getBoundingClientRect();
+      const tag = card.querySelector('.lemmings-ohno-tag');
+      if (tag) tag.remove();
+      card.classList.remove('lemmings-shaking');
+      card.classList.add('lemmings-exploded');
+
+      playRetroExplosionSound();
+      explodeCardParticles(rect);
+    }, explodeTime);
+  });
+
+  setTimeout(() => {
+    startMegaFireworks('💥 100 % LEIRI SAAVUTETTU! KAIKKI WIDGETIT RÄJÄHTIVÄT! 💥');
+  }, 42000);
+
+  setTimeout(() => {
+    showCelebrateToastText('✨ Widgetit palaavat paikoilleen... ✨', 8000);
+    cards.forEach((card, index) => {
+      setTimeout(() => {
+        card.classList.remove('lemmings-exploded');
+        card.classList.add('lemmings-returning');
+      }, index * 200);
+    });
+  }, 52000);
+
+  setTimeout(() => {
+    cards.forEach(card => {
+      card.classList.remove('lemmings-returning', 'lemmings-shaking', 'lemmings-exploded');
+      const tag = card.querySelector('.lemmings-ohno-tag');
+      if (tag) tag.remove();
+    });
+    lemmingsExploding = false;
+  }, 60000);
+}
+
+/* Keyboard shortcuts: "I" / "i" triggers 30s fireworks, "F" / "f" triggers 60s Lemmings explosion */
 window.addEventListener('keydown', e => {
   if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
   if (e.key === 'i' || e.key === 'I'){
     startMegaFireworks('🎆 ILVES26 PUOLIVÄLI! 🎆');
+  }
+  if (e.key === 'f' || e.key === 'F'){
+    startLemmingsExplosion();
   }
 });
 
